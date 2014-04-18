@@ -7,7 +7,35 @@
 //
 
 #import <UIKit/UIKit.h>
+#import <Slt/Slt.h>
+#import <OpenEars/PocketsphinxController.h>
+#import <OpenEars/OpenEarsEventsObserver.h>
+#import <AVFoundation/AVFoundation.h>
 
-@interface ViewController : UIViewController
+@class PocketsphinxController;
+@class FliteController;
+
+@interface ViewController : UIViewController <OpenEarsEventsObserverDelegate, AVAudioPlayerDelegate, AVAudioRecorderDelegate>{
+    Slt *slt;
+    
+    OpenEarsEventsObserver *openEarsEventsObserver;
+    
+    PocketsphinxController *pocketsphinxController;
+    
+    FliteController *fliteController;
+    
+}
+@property (nonatomic) Slt *slt;
+@property (nonatomic) FliteController *fliteController;
+@property (nonatomic) OpenEarsEventsObserver *openEarsEventsObserver;
+@property (nonatomic) PocketsphinxController *pocketphinxController;
+@property (nonatomic, copy) NSString *pathToDynamicallyGeneratedLanguageModel;
+@property (nonatomic, copy) NSString *pathToDynamicallyGeneratedDictionary;
+@property (nonatomic) AVAudioRecorder *audiorecorder;
+@property (nonatomic) AVAudioPlayer *audioplayer;
+
+- (IBAction)SystemStart:(id)sender;
+
+
 
 @end
