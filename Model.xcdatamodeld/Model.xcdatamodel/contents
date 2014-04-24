@@ -1,4 +1,16 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <model userDefinedModelVersionIdentifier="" type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="5064" systemVersion="13C1021" minimumToolsVersion="Xcode 4.3" macOSVersion="Automatic" iOSVersion="Automatic">
-    <elements/>
+    <entity name="Posts" representedClassName="Posts" syncable="YES">
+        <attribute name="authorname" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="posturl" optional="YES" attributeType="String" syncable="YES"/>
+    </entity>
+    <entity name="Replies" representedClassName="Replies" syncable="YES">
+        <attribute name="author" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="messageurl" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="postsurl" optional="YES" attributeType="String" syncable="YES"/>
+    </entity>
+    <elements>
+        <element name="Posts" positionX="-216" positionY="-153" width="128" height="75"/>
+        <element name="Replies" positionX="-54" positionY="9" width="128" height="88"/>
+    </elements>
 </model>

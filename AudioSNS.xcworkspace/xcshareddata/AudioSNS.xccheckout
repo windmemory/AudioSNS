@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>IDESourceControlProjectFavoriteDictionaryKey</key>
+	<false/>
+	<key>IDESourceControlProjectIdentifier</key>
+	<string>891A231E-DF67-407C-A21D-252F029B03C8</string>
+	<key>IDESourceControlProjectName</key>
+	<string>AudioSNS</string>
+	<key>IDESourceControlProjectOriginsDictionary</key>
+	<dict>
+		<key>9C19B3DF-FC27-4163-B0E0-554A5FB308FD</key>
+		<string>ssh://github.com/windmemory/AudioSNS.git</string>
+	</dict>
+	<key>IDESourceControlProjectPath</key>
+	<string>AudioSNS.xcworkspace</string>
+	<key>IDESourceControlProjectRelativeInstallPathDictionary</key>
+	<dict>
+		<key>9C19B3DF-FC27-4163-B0E0-554A5FB308FD</key>
+		<string>..</string>
+	</dict>
+	<key>IDESourceControlProjectURL</key>
+	<string>ssh://github.com/windmemory/AudioSNS.git</string>
+	<key>IDESourceControlProjectVersion</key>
+	<integer>110</integer>
+	<key>IDESourceControlProjectWCCIdentifier</key>
+	<string>9C19B3DF-FC27-4163-B0E0-554A5FB308FD</string>
+	<key>IDESourceControlProjectWCConfigurations</key>
+	<array>
+		<dict>
+			<key>IDESourceControlRepositoryExtensionIdentifierKey</key>
+			<string>public.vcs.git</string>
+			<key>IDESourceControlWCCIdentifierKey</key>
+			<string>9C19B3DF-FC27-4163-B0E0-554A5FB308FD</string>
+			<key>IDESourceControlWCCName</key>
+			<string>AudioSNS</string>
+		</dict>
+	</array>
+</dict>
+</plist>

@@ -11,6 +11,8 @@
 #import <OpenEars/PocketsphinxController.h>
 #import <OpenEars/OpenEarsEventsObserver.h>
 #import <AVFoundation/AVFoundation.h>
+#import <AudioToolbox/AudioToolbox.h>
+
 
 @class PocketsphinxController;
 @class FliteController;
@@ -33,6 +35,8 @@
 @property (nonatomic, copy) NSString *pathToDynamicallyGeneratedDictionary;
 @property (nonatomic) AVAudioRecorder *audiorecorder;
 @property (nonatomic) AVAudioPlayer *audioplayer;
+@property (weak, nonatomic) IBOutlet UILabel *Title;
+@property (weak, nonatomic) IBOutlet UIButton *StartButton;
 
 - (IBAction)SystemStart:(id)sender;
 

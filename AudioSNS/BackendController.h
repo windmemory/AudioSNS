@@ -7,7 +7,15 @@
 //
 
 #import <UIKit/UIKit.h>
+#import <AVFoundation/AVFoundation.h>
 
-@interface BackendController : UIViewController
+@interface BackendController : UIViewController <UITableViewDelegate, UITableViewDataSource>
+- (IBAction)Record:(id)sender;
+- (IBAction)Stop:(id)sender;
+
+@property AVAudioRecorder *recorder;
+@property AVAudioPlayer *player;
+@property (weak, nonatomic) IBOutlet UITableView *AudioTable;
+
 
 @end

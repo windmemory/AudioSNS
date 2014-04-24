@@ -11,6 +11,9 @@
 #import <OpenEars/AcousticModel.h>
 #import <OpenEars/OpenEarsEventsObserver.h>
 #import <OpenEars/FliteController.h>
+#import <FBShimmering.h>
+#import <FBShimmeringView.h>
+#import <FBShimmeringLayer.h>
 
 @interface ViewController ()
 
@@ -29,8 +32,13 @@
 - (void)viewDidLoad
 {
     [super viewDidLoad];
-    
     [self.openEarsEventsObserver setDelegate:self];
+    NSError *error = nil;
+    AVAudioSession *audiosession = [AVAudioSession sharedInstance];
+    [audiosession setCategory:AVAudioSessionCategoryPlayAndRecord error:&error];
+    [audiosession setActive:YES error:nil];
+    
+    
     
     LanguageModelGenerator *lmGenerator = [[LanguageModelGenerator alloc] init];
     NSArray *words = [NSArray arrayWithObjects:@"COMMENT", @"SHARE", @"YES", @"NO", @"MESSAGE", @"POSTS", @"MAKE",@"POST", nil];
@@ -57,15 +65,59 @@
     self.pathToDynamicallyGeneratedLanguageModel = lmPath;
     self.pathToDynamicallyGeneratedDictionary = dicPath;
     
+    NSDictionary *recordSetting = [NSDictionary dictionaryWithObjectsAndKeys:[NSNumber numberWithInt:AVAudioQualityMedium],AVEncoderAudioQualityKey,[NSNumber numberWithInt:16],AVEncoderBitRateKey,[NSNumber numberWithInt:2],AVNumberOfChannelsKey,[NSNumber numberWithFloat:44100.0],AVSampleRateKey, nil];
+    NSURL *url = [NSURL fileURLWithPath:[NSString stringWithFormat:@"%@/record.caf",[[NSBundle mainBundle] resourcePath]]];
+    
+    
+    self.audioplayer = [[AVAudioPlayer alloc]initWithContentsOfURL:url error:&error];
+    self.audiorecorder = [[AVAudioRecorder alloc]initWithURL:url settings:recordSetting error:&error];
+    
     [self.fliteController say:[NSString stringWithFormat:@"Welcome to Voice based SNS, press START button to start"] withVoice:self.slt];
-
+    
     
     
 }
 
 - (IBAction)SystemStart:(id)sender{
-    [self startlistening];
+    
+    
+    self.Title.hidden = YES;
+    self.StartButton.hidden = YES;
+    
+    
+    
+    FBShimmeringView *shimmeringView = [[FBShimmeringView alloc] initWithFrame:self.view.bounds];
+    [self.view addSubview:shimmeringView];
+    
+    UILabel *loadingLabel = [[UILabel alloc] initWithFrame:shimmeringView.bounds];
+    loadingLabel.textAlignment = NSTextAlignmentCenter;
+    loadingLabel.text = @"Speaking";
+    loadingLabel.textColor = [UIColor colorWithRed:16.0f/255.0f green:162.0f/255.0f blue:227.0f/255.0f alpha:1.0f];
+    loadingLabel.font = [UIFont fontWithName:@"Helvetica Light" size:36];
+    
+    shimmeringView.contentView = loadingLabel;
+    
+    // Start shimmering.
+    shimmeringView.shimmering = YES;
+    
+    [self ReadStatus];
+//    [self startlistening];
 }
+
+- (void) ReadStatus{
+    
+    NSError *error;
+    NSURL *url = [[NSBundle mainBundle] URLForResource:@"Google Glass BGM" withExtension:@"mp3"];
+    
+    self.audioplayer = [[AVAudioPlayer alloc]initWithContentsOfURL:url error:&error];
+    if (self.fliteController.speechInProgress) {
+        [self.fliteController interruptTalking];
+    }
+    [self.audioplayer setDelegate:self];
+    [self.audioplayer play];
+    
+}
+
 
 
 - (FliteController *)fliteController{
@@ -167,6 +219,10 @@
 	NSLog(@"A test file that was submitted for recognition is now complete.");
 }
 
+- (void) fliteDidFinishSpeaking {
+	NSLog(@"Flite has finished speaking"); // Log it.
+    
+}
 
 - (void)didReceiveMemoryWarning
 {
@@ -174,5 +230,9 @@
     // Dispose of any resources that can be recreated.
 }
 
+- (void)audioPlayerDidFinishPlaying:(AVAudioPlayer *)player successfully:(BOOL)flag {
+    NSLog(@"player finished playing");
+    [self startlistening];
+}
 
 @end

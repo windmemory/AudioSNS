@@ -1,0 +1,10 @@
+PODS:
+  - Shimmer (1.0.1)
+
+DEPENDENCIES:
+  - Shimmer
+
+SPEC CHECKSUMS:
+  Shimmer: a1b92685f04ae7363e655f636a41a276dbb1507e
+
+COCOAPODS: 0.32.1
