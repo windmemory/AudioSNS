@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		0BD2740D9C864FCC9E925C02 /* libPods.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 1A12720945874BB8A201D12E /* libPods.a */; };
+		3091B2021908AF0500CA93E9 /* TDSingletonCoreDataManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 3091B2011908AF0500CA93E9 /* TDSingletonCoreDataManager.m */; };
 		30A0B69418EF393A00E5AA2B /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 30A0B69318EF393A00E5AA2B /* Foundation.framework */; };
 		30A0B69618EF393A00E5AA2B /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 30A0B69518EF393A00E5AA2B /* CoreGraphics.framework */; };
 		30A0B69818EF393A00E5AA2B /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 30A0B69718EF393A00E5AA2B /* UIKit.framework */; };
@@ -25,10 +26,12 @@
 		30A992761905A5A3006FE719 /* BackendController.m in Sources */ = {isa = PBXBuildFile; fileRef = 30A992751905A5A3006FE719 /* BackendController.m */; };
 		30A992781905DC28006FE719 /* Google Glass BGM.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 30A992771905DC28006FE719 /* Google Glass BGM.mp3 */; };
 		30A992BD1906247B006FE719 /* SF1.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 30A992BC1906247B006FE719 /* SF1.mp3 */; };
-		30CD8EAA19083653008FA5E2 /* Property List.plist in Resources */ = {isa = PBXBuildFile; fileRef = 30CD8EA919083653008FA5E2 /* Property List.plist */; };
 		30CD8EAD190874F4008FA5E2 /* Model.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 30CD8EAB190874F4008FA5E2 /* Model.xcdatamodeld */; };
-		30CD8EB019087834008FA5E2 /* Posts.m in Sources */ = {isa = PBXBuildFile; fileRef = 30CD8EAF19087834008FA5E2 /* Posts.m */; };
-		30CD8EB319087835008FA5E2 /* Replies.m in Sources */ = {isa = PBXBuildFile; fileRef = 30CD8EB219087835008FA5E2 /* Replies.m */; };
+		30F1BC691908DB7600EDB639 /* CoreData.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 30F1BC681908DB7600EDB639 /* CoreData.framework */; };
+		30F1BC6C190956C300EDB639 /* Posts.m in Sources */ = {isa = PBXBuildFile; fileRef = 30F1BC6B190956C300EDB639 /* Posts.m */; };
+		30F1BC6F190956C400EDB639 /* Replies.m in Sources */ = {isa = PBXBuildFile; fileRef = 30F1BC6E190956C400EDB639 /* Replies.m */; };
+		30F1BC711909B19300EDB639 /* AudioTableCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 30F1BC701909B19300EDB639 /* AudioTableCell.xib */; };
+		30F1BC741909B22A00EDB639 /* AudioTableCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 30F1BC731909B22A00EDB639 /* AudioTableCell.m */; };
 		30FA457D18F3C26E003C937A /* AcousticModelEnglish.bundle in Resources */ = {isa = PBXBuildFile; fileRef = 30FA457918F3C26E003C937A /* AcousticModelEnglish.bundle */; };
 		30FA457E18F3C26E003C937A /* AcousticModelSpanish.bundle in Resources */ = {isa = PBXBuildFile; fileRef = 30FA457A18F3C26E003C937A /* AcousticModelSpanish.bundle */; };
 		30FA457F18F3C26E003C937A /* OpenEars.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 30FA457B18F3C26E003C937A /* OpenEars.framework */; };
@@ -50,6 +53,8 @@
 
 /* Begin PBXFileReference section */
 		1A12720945874BB8A201D12E /* libPods.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libPods.a; sourceTree = BUILT_PRODUCTS_DIR; };
+		3091B2001908AF0500CA93E9 /* TDSingletonCoreDataManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TDSingletonCoreDataManager.h; sourceTree = "<group>"; };
+		3091B2011908AF0500CA93E9 /* TDSingletonCoreDataManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TDSingletonCoreDataManager.m; sourceTree = "<group>"; };
 		30A0B69018EF393A00E5AA2B /* AudioSNS.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = AudioSNS.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		30A0B69318EF393A00E5AA2B /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
 		30A0B69518EF393A00E5AA2B /* CoreGraphics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreGraphics.framework; path = System/Library/Frameworks/CoreGraphics.framework; sourceTree = SDKROOT; };
@@ -73,12 +78,15 @@
 		30A992751905A5A3006FE719 /* BackendController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = BackendController.m; sourceTree = "<group>"; };
 		30A992771905DC28006FE719 /* Google Glass BGM.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; name = "Google Glass BGM.mp3"; path = "../../../../Desktop/Google Glass BGM.mp3"; sourceTree = "<group>"; };
 		30A992BC1906247B006FE719 /* SF1.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; name = SF1.mp3; path = ../../../../Downloads/SF1.mp3; sourceTree = "<group>"; };
-		30CD8EA919083653008FA5E2 /* Property List.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "Property List.plist"; sourceTree = "<group>"; };
 		30CD8EAC190874F4008FA5E2 /* Model.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = Model.xcdatamodel; sourceTree = "<group>"; };
-		30CD8EAE19087834008FA5E2 /* Posts.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Posts.h; sourceTree = "<group>"; };
-		30CD8EAF19087834008FA5E2 /* Posts.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Posts.m; sourceTree = "<group>"; };
-		30CD8EB119087835008FA5E2 /* Replies.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Replies.h; sourceTree = "<group>"; };
-		30CD8EB219087835008FA5E2 /* Replies.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Replies.m; sourceTree = "<group>"; };
+		30F1BC681908DB7600EDB639 /* CoreData.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreData.framework; path = System/Library/Frameworks/CoreData.framework; sourceTree = SDKROOT; };
+		30F1BC6A190956C300EDB639 /* Posts.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Posts.h; sourceTree = "<group>"; };
+		30F1BC6B190956C300EDB639 /* Posts.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Posts.m; sourceTree = "<group>"; };
+		30F1BC6D190956C400EDB639 /* Replies.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Replies.h; sourceTree = "<group>"; };
+		30F1BC6E190956C400EDB639 /* Replies.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Replies.m; sourceTree = "<group>"; };
+		30F1BC701909B19300EDB639 /* AudioTableCell.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = AudioTableCell.xib; sourceTree = "<group>"; };
+		30F1BC721909B22A00EDB639 /* AudioTableCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = AudioTableCell.h; path = ../AudioTableCell.h; sourceTree = "<group>"; };
+		30F1BC731909B22A00EDB639 /* AudioTableCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = AudioTableCell.m; path = ../AudioTableCell.m; sourceTree = "<group>"; };
 		30FA457918F3C26E003C937A /* AcousticModelEnglish.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; path = AcousticModelEnglish.bundle; sourceTree = "<group>"; };
 		30FA457A18F3C26E003C937A /* AcousticModelSpanish.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; path = AcousticModelSpanish.bundle; sourceTree = "<group>"; };
 		30FA457B18F3C26E003C937A /* OpenEars.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = OpenEars.framework; sourceTree = "<group>"; };
@@ -94,6 +102,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				30F1BC691908DB7600EDB639 /* CoreData.framework in Frameworks */,
 				30FA458418F3C661003C937A /* AudioToolbox.framework in Frameworks */,
 				30FA458518F3C661003C937A /* AVFoundation.framework in Frameworks */,
 				30FA458618F3C661003C937A /* SystemConfiguration.framework in Frameworks */,
@@ -144,6 +153,7 @@
 		30A0B69218EF393A00E5AA2B /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				30F1BC681908DB7600EDB639 /* CoreData.framework */,
 				30FA458118F3C661003C937A /* AudioToolbox.framework */,
 				30FA458218F3C661003C937A /* AVFoundation.framework */,
 				30FA458318F3C661003C937A /* SystemConfiguration.framework */,
@@ -159,16 +169,20 @@
 		30A0B69918EF393A00E5AA2B /* AudioSNS */ = {
 			isa = PBXGroup;
 			children = (
+				30F1BC721909B22A00EDB639 /* AudioTableCell.h */,
+				30F1BC731909B22A00EDB639 /* AudioTableCell.m */,
+				3091B2001908AF0500CA93E9 /* TDSingletonCoreDataManager.h */,
+				3091B2011908AF0500CA93E9 /* TDSingletonCoreDataManager.m */,
 				30A992741905A5A3006FE719 /* BackendController.h */,
 				30A992751905A5A3006FE719 /* BackendController.m */,
 				30A0B6A218EF393A00E5AA2B /* AppDelegate.h */,
 				30A0B6A318EF393A00E5AA2B /* AppDelegate.m */,
 				30A0B6A518EF393A00E5AA2B /* Main.storyboard */,
+				30F1BC701909B19300EDB639 /* AudioTableCell.xib */,
 				30A0B6A818EF393A00E5AA2B /* ViewController.h */,
 				30A0B6A918EF393A00E5AA2B /* ViewController.m */,
 				30A0B6AB18EF393A00E5AA2B /* Images.xcassets */,
 				30A0B69A18EF393A00E5AA2B /* Supporting Files */,
-				30CD8EA919083653008FA5E2 /* Property List.plist */,
 			);
 			path = AudioSNS;
 			sourceTree = "<group>";
@@ -207,11 +221,11 @@
 		30CD8EB41908785A008FA5E2 /* Model */ = {
 			isa = PBXGroup;
 			children = (
+				30F1BC6D190956C400EDB639 /* Replies.h */,
+				30F1BC6E190956C400EDB639 /* Replies.m */,
+				30F1BC6A190956C300EDB639 /* Posts.h */,
+				30F1BC6B190956C300EDB639 /* Posts.m */,
 				30CD8EAB190874F4008FA5E2 /* Model.xcdatamodeld */,
-				30CD8EB119087835008FA5E2 /* Replies.h */,
-				30CD8EB219087835008FA5E2 /* Replies.m */,
-				30CD8EAE19087834008FA5E2 /* Posts.h */,
-				30CD8EAF19087834008FA5E2 /* Posts.m */,
 			);
 			name = Model;
 			sourceTree = "<group>";
@@ -310,8 +324,8 @@
 				30FA457D18F3C26E003C937A /* AcousticModelEnglish.bundle in Resources */,
 				30A992781905DC28006FE719 /* Google Glass BGM.mp3 in Resources */,
 				30A992BD1906247B006FE719 /* SF1.mp3 in Resources */,
+				30F1BC711909B19300EDB639 /* AudioTableCell.xib in Resources */,
 				30A0B69E18EF393A00E5AA2B /* InfoPlist.strings in Resources */,
-				30CD8EAA19083653008FA5E2 /* Property List.plist in Resources */,
 				30A0B6A718EF393A00E5AA2B /* Main.storyboard in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -364,11 +378,13 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				30CD8EB319087835008FA5E2 /* Replies.m in Sources */,
+				30F1BC6F190956C400EDB639 /* Replies.m in Sources */,
+				3091B2021908AF0500CA93E9 /* TDSingletonCoreDataManager.m in Sources */,
 				30A0B6AA18EF393A00E5AA2B /* ViewController.m in Sources */,
+				30F1BC6C190956C300EDB639 /* Posts.m in Sources */,
+				30F1BC741909B22A00EDB639 /* AudioTableCell.m in Sources */,
 				30A0B6A418EF393A00E5AA2B /* AppDelegate.m in Sources */,
 				30CD8EAD190874F4008FA5E2 /* Model.xcdatamodeld in Sources */,
-				30CD8EB019087834008FA5E2 /* Posts.m in Sources */,
 				30A992761905A5A3006FE719 /* BackendController.m in Sources */,
 				30A0B6A018EF393A00E5AA2B /* main.m in Sources */,
 			);

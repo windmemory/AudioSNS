@@ -8,14 +8,20 @@
 
 #import <UIKit/UIKit.h>
 #import <AVFoundation/AVFoundation.h>
+//#import "TDSingletonCoreDataManager.h"
 
-@interface BackendController : UIViewController <UITableViewDelegate, UITableViewDataSource>
+@class Posts;
+
+@interface BackendController : UIViewController <UITableViewDelegate, UITableViewDataSource,UITextFieldDelegate>
 - (IBAction)Record:(id)sender;
 - (IBAction)Stop:(id)sender;
+
 
 @property AVAudioRecorder *recorder;
 @property AVAudioPlayer *player;
 @property (weak, nonatomic) IBOutlet UITableView *AudioTable;
+@property (nonatomic) NSUserDefaults *defaults;
+@property (weak, nonatomic) IBOutlet UITextField *NameBox;
 
 
 @end

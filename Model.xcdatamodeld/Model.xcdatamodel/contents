@@ -2,15 +2,17 @@
 <model userDefinedModelVersionIdentifier="" type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="5064" systemVersion="13C1021" minimumToolsVersion="Xcode 4.3" macOSVersion="Automatic" iOSVersion="Automatic">
     <entity name="Posts" representedClassName="Posts" syncable="YES">
         <attribute name="authorname" optional="YES" attributeType="String" syncable="YES"/>
-        <attribute name="posturl" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="posturl" optional="YES" attributeType="Transformable" syncable="YES"/>
+        <relationship name="postofreply" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="Replies" inverseName="replyofpost" inverseEntity="Replies" syncable="YES"/>
     </entity>
     <entity name="Replies" representedClassName="Replies" syncable="YES">
         <attribute name="author" optional="YES" attributeType="String" syncable="YES"/>
-        <attribute name="messageurl" optional="YES" attributeType="String" syncable="YES"/>
-        <attribute name="postsurl" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="messageurl" optional="YES" attributeType="Transformable" syncable="YES"/>
+        <attribute name="postsurl" optional="YES" attributeType="Transformable" syncable="YES"/>
+        <relationship name="replyofpost" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Posts" inverseName="postofreply" inverseEntity="Posts" syncable="YES"/>
     </entity>
     <elements>
-        <element name="Posts" positionX="-216" positionY="-153" width="128" height="75"/>
-        <element name="Replies" positionX="-54" positionY="9" width="128" height="88"/>
+        <element name="Posts" positionX="-216" positionY="-153" width="128" height="88"/>
+        <element name="Replies" positionX="-54" positionY="9" width="128" height="103"/>
     </elements>
 </model>
