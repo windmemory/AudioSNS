@@ -11,6 +11,7 @@
 #import <CoreData/CoreData.h>
 #import "Posts.h"
 #import "AudioTableCell.h"
+#import "ViewController.h"
 
 @interface BackendController ()
 @property (nonatomic) NSDictionary *recordSetting;
@@ -50,13 +51,18 @@
 //    AudioServicesCreateSystemSoundID((__bridge CFURLRef)soundurl, &SF1);
 //    AudioServicesAddSystemSoundCompletion(SF1, NULL, NULL, finishPlaySoundCallBack, NULL);
 //    AudioServicesPlaySystemSound(SF1);
+    [self prepareData];
+    
+}
+
+- (void)prepareData{
     NSError *error;
     NSFetchRequest *fetchRequest = [[NSFetchRequest alloc] init];
     [fetchRequest setReturnsObjectsAsFaults:NO];
     NSEntityDescription *entity = [NSEntityDescription entityForName:@"Posts" inManagedObjectContext:[TDSingletonCoreDataManager getManagedObjectContext]];
     [fetchRequest setEntity:entity];
     _PostsArray = [NSMutableArray arrayWithArray:[[TDSingletonCoreDataManager
-                                                getManagedObjectContext] executeFetchRequest:fetchRequest error:&error] ];
+                                                   getManagedObjectContext] executeFetchRequest:fetchRequest error:&error] ];
     
     
     NSEntityDescription *repliesentity = [NSEntityDescription entityForName:@"Replies" inManagedObjectContext:[TDSingletonCoreDataManager getManagedObjectContext]];
@@ -69,7 +75,14 @@
         [self.defaults setInteger:0 forKey:@"count"];
         [self.defaults synchronize];
     }
-    
+}
+
+- (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender{
+    if ([segue.identifier isEqualToString:@"Backend"]) {
+        ViewController *mainscreen = segue.destinationViewController;
+        mainscreen.PostsArray = _PostsArray;
+    }
+    [player stop];
 }
 
 - (void)didReceiveMemoryWarning
@@ -86,23 +99,20 @@
 - (void) tableView:(UITableView *)tableView commitEditingStyle:(UITableViewCellEditingStyle)editingStyle forRowAtIndexPath:(NSIndexPath *)indexPath{
     
     if (editingStyle == UITableViewCellEditingStyleDelete) {
+        [[TDSingletonCoreDataManager getManagedObjectContext] deleteObject:_PostsArray[indexPath.row]];
         [_PostsArray removeObjectAtIndex:indexPath.row];
         [self.AudioTable deleteRowsAtIndexPaths:[NSArray arrayWithObjects:indexPath, nil] withRowAnimation:UITableViewRowAnimationFade];
     }
+    
     NSLog(@"%@",_PostsArray);
     [TDSingletonCoreDataManager saveContext];
 }
 
-/*
+
 #pragma mark - Navigation
 
 // In a storyboard-based application, you will often want to do a little preparation before navigation
-- (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender
-{
-    // Get the new view controller using [segue destinationViewController].
-    // Pass the selected object to the new view controller.
-}
-*/
+
 
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section{

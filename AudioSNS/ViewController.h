@@ -37,10 +37,11 @@
 @property (nonatomic, copy) NSString *pathToDynamicallyGeneratedDictionary;
 @property (nonatomic) AVAudioRecorder *audiorecorder;
 @property (nonatomic) AVAudioPlayer *audioplayer;
+@property (nonatomic) NSArray *PostsArray;
+@property (nonatomic) NSArray *Replies;
 @property (weak, nonatomic) IBOutlet UILabel *Title;
 @property (weak, nonatomic) IBOutlet UIButton *StartButton;
 @property (weak, nonatomic) IBOutlet UIButton *StopButton;
-
 
 
 - (IBAction)SystemStart:(id)sender;

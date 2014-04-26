@@ -69,7 +69,7 @@
                     <navigationItem key="navigationItem" id="M5x-3o-UmF">
                         <barButtonItem key="leftBarButtonItem" title="**" id="e5q-5P-Ol8">
                             <connections>
-                                <segue destination="6OP-gY-vkX" kind="modal" modalTransitionStyle="partialCurl" id="M91-b1-Jbv"/>
+                                <segue destination="6OP-gY-vkX" kind="modal" identifier="Backend" modalTransitionStyle="partialCurl" id="M91-b1-Jbv"/>
                             </connections>
                         </barButtonItem>
                     </navigationItem>

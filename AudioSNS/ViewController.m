@@ -11,6 +11,7 @@
 #import <OpenEars/AcousticModel.h>
 #import <OpenEars/OpenEarsEventsObserver.h>
 #import <OpenEars/FliteController.h>
+#import <OpenEars/OpenEarsLogging.h>
 #import <FBShimmering.h>
 #import <FBShimmeringView.h>
 #import <FBShimmeringLayer.h>
@@ -18,11 +19,25 @@
 #import "TDSingletonCoreDataManager.h"
 #import "Posts.h"
 
+typedef enum{
+    isStart,
+    isSpeakingNameofPost,
+    isSpeakingPost,
+    isSpeakingGeneralInstruction,
+    isSpeakingCommentInstruction,
+    isSpeakingShareInstruction,
+    isSpeakingNewPostInstruction,
+    SoundEffectFinishSpeakPost,
+    SoundEffectdefault
+}Status;
+
 @interface ViewController ()
 
-@property (nonatomic) NSArray *PostsArray;
-@property (nonatomic) NSArray *Replies;
+
 @property (nonatomic) int NumberofPostisPlaying;
+@property (nonatomic) Status status;
+@property (nonatomic) UILabel *StatusLabel;
+@property (nonatomic) FBShimmeringView *shimmeringView;
 @end
 
 @implementation ViewController
@@ -35,11 +50,13 @@
 @synthesize pathToDynamicallyGeneratedLanguageModel;
 
 
+
 - (void)viewDidLoad
 {
     [super viewDidLoad];
     
     self.StopButton.hidden = YES;
+    self.StartButton.hidden = YES;
     _NumberofPostisPlaying = 0;
     
     [self.openEarsEventsObserver setDelegate:self];
@@ -81,52 +98,61 @@
     } else {
         NSLog(@"Error: %@",[err localizedDescription]);
     }
-    
     self.pathToDynamicallyGeneratedLanguageModel = lmPath;
     self.pathToDynamicallyGeneratedDictionary = dicPath;
     
-    NSDictionary *recordSetting = [NSDictionary dictionaryWithObjectsAndKeys:[NSNumber numberWithInt:AVAudioQualityMedium],AVEncoderAudioQualityKey,[NSNumber numberWithInt:16],AVEncoderBitRateKey,[NSNumber numberWithInt:2],AVNumberOfChannelsKey,[NSNumber numberWithFloat:44100.0],AVSampleRateKey, nil];
-    NSURL *url = [NSURL fileURLWithPath:[NSString stringWithFormat:@"%@/record.caf",[[NSBundle mainBundle] resourcePath]]];
+//--------------record setting not use for now------------------------------------------------
+//    NSDictionary *recordSetting = [NSDictionary dictionaryWithObjectsAndKeys:[NSNumber numberWithInt:AVAudioQualityMedium],AVEncoderAudioQualityKey,[NSNumber numberWithInt:16],AVEncoderBitRateKey,[NSNumber numberWithInt:2],AVNumberOfChannelsKey,[NSNumber numberWithFloat:44100.0],AVSampleRateKey, nil];
+//    NSURL *url = [NSURL fileURLWithPath:[NSString stringWithFormat:@"%@/record.caf",[[NSBundle mainBundle] resourcePath]]];
+//--------------------------------------------------------------------------------------------
     
     
-    self.audioplayer = [[AVAudioPlayer alloc]initWithContentsOfURL:url error:&error];
-    self.audiorecorder = [[AVAudioRecorder alloc]initWithURL:url settings:recordSetting error:&error];
     
     [self.fliteController say:[NSString stringWithFormat:@"Welcome to Voice based SNS, press START button to start"] withVoice:self.slt];
+    self.StartButton.hidden = NO;
     
-    
+    _status = isStart;
     
 }
+
+- (void) prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender{
+    [self StopSystem];
+}
+
+
 
 - (IBAction)SystemStart:(id)sender{
     
     self.StopButton.hidden = NO;
     self.Title.hidden = YES;
     self.StartButton.hidden = YES;
+    if (_shimmeringView == nil) {
+        [self initializashimmeringview];
+    }else{
+        _shimmeringView.hidden = NO;
+        _StatusLabel.hidden = NO;
+    }
     
-    
-    
-    FBShimmeringView *shimmeringView = [[FBShimmeringView alloc] initWithFrame:self.view.bounds];
-    [self.view addSubview:shimmeringView];
-    
-    UILabel *loadingLabel = [[UILabel alloc] initWithFrame:shimmeringView.bounds];
-    loadingLabel.textAlignment = NSTextAlignmentCenter;
-    loadingLabel.text = @"Speaking";
-    loadingLabel.textColor = [UIColor colorWithRed:16.0f/255.0f green:162.0f/255.0f blue:227.0f/255.0f alpha:1.0f];
-    loadingLabel.font = [UIFont fontWithName:@"Helvetica Light" size:36];
-    
-    shimmeringView.contentView = loadingLabel;
-    // Start shimmering.
-    shimmeringView.shimmering = YES;
+    if ([self.fliteController speechInProgress]) {
+        [self.fliteController interruptTalking];
+    }
     
     [self ReadStatus];
 
 }
 
+
 - (IBAction)SystemStop:(id)sender {
     self.StopButton.hidden = YES;
     self.Title.hidden = NO;
     self.StartButton.hidden = NO;
+    _StatusLabel.hidden = YES;
+    _shimmeringView.hidden = YES;
+    [self StopSystem];
+}
+
+
+- (void) StopSystem{
     if ([self.audioplayer isPlaying]) {
         [self.audioplayer stop];
     }
@@ -136,18 +162,48 @@
     if ([self.fliteController speechInProgress]) {
         [self.fliteController interruptTalking];
     }
+    if ([self.pocketphinxController isListening]) {
+        [self.pocketphinxController stopListening];
+    }
 }
 
 #pragma mark - Read Posts and Read instruction
 
 - (void) ReadStatus{
-    
-    Posts *onepost = _PostsArray[_NumberofPostisPlaying];
-    [self.fliteController say:[NSString stringWithFormat:@"%@ posted a status",onepost.authorname] withVoice:slt];
-    
+    NSLog(@"%ld",[_PostsArray count]);
+    if ([_PostsArray count] == 0) {
+        [self StopSystem];
+        [self.fliteController say:@"You don't have any friends' posts in your timeline" withVoice:slt];
+        self.StopButton.hidden = YES;
+        self.Title.hidden = NO;
+        self.StartButton.hidden = NO;
+        _StatusLabel.hidden = YES;
+        _shimmeringView.hidden = YES;
+    }else{
+        Posts *onepost = _PostsArray[_NumberofPostisPlaying];
+        _status = isSpeakingNameofPost;
+        [self.fliteController say:[NSString stringWithFormat:@"%@ posted a status",onepost.authorname] withVoice:slt];
+    }
 }
-
-
+- (void) fliteDidFinishSpeaking {
+	NSLog(@"Flite has finished speaking"); // Log it.
+    NSError *error;
+    
+    if (_status == isSpeakingNameofPost) {
+        Posts *onepost = _PostsArray[_NumberofPostisPlaying];
+        self.audioplayer = [[AVAudioPlayer alloc]initWithContentsOfURL:onepost.posturl error:&error];
+        [self.audioplayer setDelegate:self];
+        [self.audioplayer play];
+        return;
+    }else if(_status == isSpeakingGeneralInstruction){
+        [self startlistening];
+        return;
+    }
+    
+//    if ((_NumberofPostisPlaying+1) < [_PostsArray count]) {
+//        _NumberofPostisPlaying ++;
+//    }
+}
 
 - (FliteController *)fliteController{
     if (fliteController == nil) {
@@ -167,6 +223,7 @@
     if (openEarsEventsObserver == nil) {
         openEarsEventsObserver = [[OpenEarsEventsObserver alloc]init];
     }
+    
     return openEarsEventsObserver;
 }
 
@@ -174,18 +231,18 @@
     if (pocketphinxController == nil) {
         pocketphinxController = [[PocketsphinxController alloc]init];
     }
-    pocketphinxController.returnNbest = 0;
-    pocketphinxController.nBestNumber = 6;
 
     return pocketphinxController;
 }
 
 - (void) startlistening{
     [self.pocketphinxController startListeningWithLanguageModelAtPath:self.pathToDynamicallyGeneratedLanguageModel dictionaryAtPath:self.pathToDynamicallyGeneratedDictionary acousticModelAtPath:[AcousticModel pathToModel:@"AcousticModelEnglish"] languageModelIsJSGF:FALSE];
+    
 }
 
 - (void) stoplistening{
     [self.pocketphinxController stopListening];
+    
 }
 
 -(void) pocketsphinxDidReceiveHypothesis:(NSString *)hypothesis recognitionScore:(NSString *)recognitionScore utteranceID:(NSString *)utteranceID{
@@ -203,11 +260,9 @@
 
 - (void)audioPlayerDidFinishPlaying:(AVAudioPlayer *)player successfully:(BOOL)flag {
     
+    _status = isSpeakingGeneralInstruction;
     
-    
-    [self startlistening];
-    
-    
+    [self.fliteController say:@"Say Comment to make a comment on this post. share to share this post. continue to continue to next post or post to make a new post on your own timeline" withVoice:slt];
     
 }
 
@@ -259,19 +314,7 @@
 	NSLog(@"A test file that was submitted for recognition is now complete.");
 }
 
-- (void) fliteDidFinishSpeaking {
-	NSLog(@"Flite has finished speaking"); // Log it.
-    NSError *error;
-    Posts *onepost = _PostsArray[_NumberofPostisPlaying];
-    self.audioplayer = [[AVAudioPlayer alloc]initWithContentsOfURL:onepost.posturl error:&error];
-    if (self.fliteController.speechInProgress) {
-        [self.fliteController interruptTalking];
-    }
-    [self.audioplayer setDelegate:self];
-    _NumberofPostisPlaying ++;
-    [self.audioplayer play];
-    
-}
+
 
 - (void)didReceiveMemoryWarning
 {
@@ -279,6 +322,20 @@
     // Dispose of any resources that can be recreated.
 }
 
-
+- (void) initializashimmeringview{
+    _shimmeringView = [[FBShimmeringView alloc] initWithFrame:CGRectMake(0, 220, 320, 150)];
+    NSLog(@"%@",self.view);
+    [self.view addSubview:_shimmeringView];
+    
+    _StatusLabel = [[UILabel alloc] initWithFrame:_shimmeringView.bounds];
+    _StatusLabel.textAlignment = NSTextAlignmentCenter;
+    _StatusLabel.text = @"Speaking";
+    _StatusLabel.textColor = [UIColor colorWithRed:16.0f/255.0f green:162.0f/255.0f blue:227.0f/255.0f alpha:1.0f];
+    _StatusLabel.font = [UIFont fontWithName:@"Helvetica Light" size:36];
+    
+    _shimmeringView.contentView = _StatusLabel;
+    // Start shimmering.
+    _shimmeringView.shimmering = YES;
+}
 
 @end
