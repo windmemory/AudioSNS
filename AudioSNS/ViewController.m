@@ -14,9 +14,15 @@
 #import <FBShimmering.h>
 #import <FBShimmeringView.h>
 #import <FBShimmeringLayer.h>
+#import <CoreData/CoreData.h>
+#import "TDSingletonCoreDataManager.h"
+#import "Posts.h"
 
 @interface ViewController ()
 
+@property (nonatomic) NSArray *PostsArray;
+@property (nonatomic) NSArray *Replies;
+@property (nonatomic) int NumberofPostisPlaying;
 @end
 
 @implementation ViewController
@@ -32,12 +38,28 @@
 - (void)viewDidLoad
 {
     [super viewDidLoad];
+    
+    self.StopButton.hidden = YES;
+    _NumberofPostisPlaying = 0;
+    
     [self.openEarsEventsObserver setDelegate:self];
     NSError *error = nil;
     AVAudioSession *audiosession = [AVAudioSession sharedInstance];
     [audiosession setCategory:AVAudioSessionCategoryPlayAndRecord error:&error];
     [audiosession setActive:YES error:nil];
     
+    NSError *dataerror;
+    NSFetchRequest *fetchRequest = [[NSFetchRequest alloc] init];
+    [fetchRequest setReturnsObjectsAsFaults:NO];
+    NSEntityDescription *entity = [NSEntityDescription entityForName:@"Posts" inManagedObjectContext:[TDSingletonCoreDataManager getManagedObjectContext]];
+    [fetchRequest setEntity:entity];
+    _PostsArray = [NSMutableArray arrayWithArray:[[TDSingletonCoreDataManager
+                                                   getManagedObjectContext] executeFetchRequest:fetchRequest error:&dataerror] ];
+    
+    
+    NSEntityDescription *repliesentity = [NSEntityDescription entityForName:@"Replies" inManagedObjectContext:[TDSingletonCoreDataManager getManagedObjectContext]];
+    [fetchRequest setEntity:repliesentity];
+    _Replies = [NSMutableArray arrayWithArray:[[TDSingletonCoreDataManager getManagedObjectContext] executeFetchRequest:fetchRequest error:&dataerror]];
     
     
     LanguageModelGenerator *lmGenerator = [[LanguageModelGenerator alloc] init];
@@ -52,12 +74,10 @@
     NSString *dicPath = nil;
 	
     if([err code] == noErr) {
-        
         languageGeneratorResults = [err userInfo];
 		
         lmPath = [languageGeneratorResults objectForKey:@"LMPath"];
         dicPath = [languageGeneratorResults objectForKey:@"DictionaryPath"];
-		
     } else {
         NSLog(@"Error: %@",[err localizedDescription]);
     }
@@ -80,7 +100,7 @@
 
 - (IBAction)SystemStart:(id)sender{
     
-    
+    self.StopButton.hidden = NO;
     self.Title.hidden = YES;
     self.StartButton.hidden = YES;
     
@@ -96,25 +116,34 @@
     loadingLabel.font = [UIFont fontWithName:@"Helvetica Light" size:36];
     
     shimmeringView.contentView = loadingLabel;
-    
     // Start shimmering.
     shimmeringView.shimmering = YES;
     
     [self ReadStatus];
-//    [self startlistening];
+
 }
+
+- (IBAction)SystemStop:(id)sender {
+    self.StopButton.hidden = YES;
+    self.Title.hidden = NO;
+    self.StartButton.hidden = NO;
+    if ([self.audioplayer isPlaying]) {
+        [self.audioplayer stop];
+    }
+    if ([self.audiorecorder isRecording]) {
+        [self.audiorecorder stop];
+    }
+    if ([self.fliteController speechInProgress]) {
+        [self.fliteController interruptTalking];
+    }
+}
+
+#pragma mark - Read Posts and Read instruction
 
 - (void) ReadStatus{
     
-    NSError *error;
-    NSURL *url = [[NSBundle mainBundle] URLForResource:@"Google Glass BGM" withExtension:@"mp3"];
-    
-    self.audioplayer = [[AVAudioPlayer alloc]initWithContentsOfURL:url error:&error];
-    if (self.fliteController.speechInProgress) {
-        [self.fliteController interruptTalking];
-    }
-    [self.audioplayer setDelegate:self];
-    [self.audioplayer play];
+    Posts *onepost = _PostsArray[_NumberofPostisPlaying];
+    [self.fliteController say:[NSString stringWithFormat:@"%@ posted a status",onepost.authorname] withVoice:slt];
     
 }
 
@@ -172,10 +201,18 @@
     
 }
 
-- (void) pocketsphinxDidReceiveNBestHypothesisArray:(NSArray *)hypothesisArray { // Pocketsphinx has an n-best hypothesis dictionary.
-    NSLog(@"hypothesisArray is %@",hypothesisArray);
+- (void)audioPlayerDidFinishPlaying:(AVAudioPlayer *)player successfully:(BOOL)flag {
+    
+    
+    
+    [self startlistening];
+    
+    
+    
 }
 
+
+#pragma mark - SpeechRecognition
 - (void) pocketsphinxDidStartCalibration {
 	NSLog(@"Pocketsphinx calibration has started.");
 }
@@ -215,12 +252,24 @@
 - (void) pocketSphinxContinuousSetupDidFail { // This can let you know that something went wrong with the recognition loop startup. Turn on OPENEARSLOGGING to learn why.
 	NSLog(@"Setting up the continuous recognition loop has failed for some reason, please turn on OpenEarsLogging to learn more.");
 }
+
+
+
 - (void) testRecognitionCompleted {
 	NSLog(@"A test file that was submitted for recognition is now complete.");
 }
 
 - (void) fliteDidFinishSpeaking {
 	NSLog(@"Flite has finished speaking"); // Log it.
+    NSError *error;
+    Posts *onepost = _PostsArray[_NumberofPostisPlaying];
+    self.audioplayer = [[AVAudioPlayer alloc]initWithContentsOfURL:onepost.posturl error:&error];
+    if (self.fliteController.speechInProgress) {
+        [self.fliteController interruptTalking];
+    }
+    [self.audioplayer setDelegate:self];
+    _NumberofPostisPlaying ++;
+    [self.audioplayer play];
     
 }
 
@@ -230,9 +279,6 @@
     // Dispose of any resources that can be recreated.
 }
 
-- (void)audioPlayerDidFinishPlaying:(AVAudioPlayer *)player successfully:(BOOL)flag {
-    NSLog(@"player finished playing");
-    [self startlistening];
-}
+
 
 @end

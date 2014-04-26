@@ -7,9 +7,10 @@
 //
 
 #import "AudioTableCell.h"
-
+#import <AVFoundation/AVFoundation.h>
 @implementation AudioTableCell
 
+@synthesize PlayButton;
 @synthesize Postsname;
 @synthesize AudioFileName;
 
@@ -34,6 +35,4 @@
     // Configure the view for the selected state
 }
 
-- (IBAction)PlayThisAudio:(id)sender {
-}
 @end

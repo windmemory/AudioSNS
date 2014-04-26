@@ -14,8 +14,8 @@
 @interface Replies : NSManagedObject
 
 @property (nonatomic, retain) NSString * author;
-@property (nonatomic, retain) id messageurl;
-@property (nonatomic, retain) id postsurl;
+@property (nonatomic, retain) NSURL *messageurl;
+@property (nonatomic, retain) NSURL *postsurl;
 @property (nonatomic, retain) Posts *replyofpost;
 
 @end

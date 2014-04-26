@@ -19,9 +19,6 @@
                         <state key="normal" title="Play">
                             <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
                         </state>
-                        <connections>
-                            <action selector="PlayThisAudio:" destination="URA-8A-CHd" eventType="touchUpInside" id="QKs-Z6-tuY"/>
-                        </connections>
                     </button>
                     <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" text="Label" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="ADc-SY-IG0">
                         <rect key="frame" x="20" y="6" width="226" height="21"/>
@@ -40,6 +37,7 @@
             </tableViewCellContentView>
             <connections>
                 <outlet property="AudioFileName" destination="MsM-Sh-tec" id="XMf-at-On1"/>
+                <outlet property="PlayButton" destination="56A-ub-hB1" id="zUZ-v8-S9r"/>
                 <outlet property="Postsname" destination="ADc-SY-IG0" id="Ey0-e6-pue"/>
             </connections>
         </tableViewCell>

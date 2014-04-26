@@ -16,6 +16,8 @@
 
 @class PocketsphinxController;
 @class FliteController;
+@class Posts;
+@class Replies;
 
 @interface ViewController : UIViewController <OpenEarsEventsObserverDelegate, AVAudioPlayerDelegate, AVAudioRecorderDelegate>{
     Slt *slt;
@@ -37,8 +39,12 @@
 @property (nonatomic) AVAudioPlayer *audioplayer;
 @property (weak, nonatomic) IBOutlet UILabel *Title;
 @property (weak, nonatomic) IBOutlet UIButton *StartButton;
+@property (weak, nonatomic) IBOutlet UIButton *StopButton;
+
+
 
 - (IBAction)SystemStart:(id)sender;
+- (IBAction)SystemStop:(id)sender;
 
 
 

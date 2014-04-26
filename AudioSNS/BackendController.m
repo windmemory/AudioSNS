@@ -38,6 +38,9 @@
 - (void)viewDidLoad
 {
     [super viewDidLoad];
+    
+    _context = [TDSingletonCoreDataManager getManagedObjectContext];
+    
     _recordSetting = [NSDictionary dictionaryWithObjectsAndKeys:[NSNumber numberWithInt:AVAudioQualityMedium],AVEncoderAudioQualityKey,[NSNumber numberWithInt:16],AVEncoderBitRateKey,[NSNumber numberWithInt:2],AVNumberOfChannelsKey,[NSNumber numberWithFloat:44100.0],AVSampleRateKey, nil];
     
     
@@ -49,15 +52,16 @@
 //    AudioServicesPlaySystemSound(SF1);
     NSError *error;
     NSFetchRequest *fetchRequest = [[NSFetchRequest alloc] init];
+    [fetchRequest setReturnsObjectsAsFaults:NO];
     NSEntityDescription *entity = [NSEntityDescription entityForName:@"Posts" inManagedObjectContext:[TDSingletonCoreDataManager getManagedObjectContext]];
     [fetchRequest setEntity:entity];
     _PostsArray = [NSMutableArray arrayWithArray:[[TDSingletonCoreDataManager
                                                 getManagedObjectContext] executeFetchRequest:fetchRequest error:&error] ];
     
+    
     NSEntityDescription *repliesentity = [NSEntityDescription entityForName:@"Replies" inManagedObjectContext:[TDSingletonCoreDataManager getManagedObjectContext]];
     [fetchRequest setEntity:repliesentity];
     _Replies = [NSMutableArray arrayWithArray:[[TDSingletonCoreDataManager getManagedObjectContext] executeFetchRequest:fetchRequest error:&error]];
-    
     
     self.defaults = [NSUserDefaults standardUserDefaults];
     
@@ -74,6 +78,21 @@
     // Dispose of any resources that can be recreated.
 }
 
+#pragma mark - Tableview
+- (BOOL) tableView:(UITableView *)tableView canEditRowAtIndexPath:(NSIndexPath *)indexPath{
+    return YES;
+}
+
+- (void) tableView:(UITableView *)tableView commitEditingStyle:(UITableViewCellEditingStyle)editingStyle forRowAtIndexPath:(NSIndexPath *)indexPath{
+    
+    if (editingStyle == UITableViewCellEditingStyleDelete) {
+        [_PostsArray removeObjectAtIndex:indexPath.row];
+        [self.AudioTable deleteRowsAtIndexPaths:[NSArray arrayWithObjects:indexPath, nil] withRowAnimation:UITableViewRowAnimationFade];
+    }
+    NSLog(@"%@",_PostsArray);
+    [TDSingletonCoreDataManager saveContext];
+}
+
 /*
 #pragma mark - Navigation
 
@@ -85,11 +104,20 @@
 }
 */
 
+
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section{
-    return 1;
+    return [_PostsArray count];
 }
 
--(UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath{
+- (void) PlayButtonClicked:(UIButton*)sender{
+    NSError *error;
+    Posts *onepost = _PostsArray[sender.tag];
+    player = [[AVAudioPlayer alloc]initWithContentsOfURL:onepost.posturl error:&error];
+    
+    [player play];
+}
+
+- (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath{
     
     AudioTableCell *cell = (AudioTableCell*)[tableView dequeueReusableCellWithIdentifier:@"cell"];
     if (cell == nil) {
@@ -97,14 +125,22 @@
         cell = [tableView dequeueReusableCellWithIdentifier:@"cell"];
     }
     
+    Posts *oneposts = _PostsArray[indexPath.row];
+    cell.Postsname.text = oneposts.authorname;
+    cell.AudioFileName.text = [oneposts.posturl absoluteString];
+    
+    cell.PlayButton.tag = indexPath.row;
+    [cell.PlayButton addTarget:self action:@selector(PlayButtonClicked:) forControlEvents:UIControlEventTouchUpInside];
+    
     return cell;
 }
+
+#pragma mark - Recorder and Player
 
 
 
 - (IBAction)Record:(id)sender {
     
-    NSLog(@"record");
     _count = [self.defaults integerForKey:@"count"];
     _recordurl = [NSURL fileURLWithPath:[NSString stringWithFormat:@"%@/Record%ld.caf",[[NSBundle mainBundle] resourcePath],_count]];
     
@@ -123,7 +159,7 @@
         [self.recorder record];
     }
     
-    NSLog(@"%@",NameBox.text);
+    
     
 }
 
@@ -138,13 +174,16 @@
     newposts.authorname = self.NameBox.text;
     newposts.posturl = _recordurl;
     [_PostsArray addObject:newposts];
-    NSLog(@"%@\n\n%@",_PostsArray,newposts);
+    
     [TDSingletonCoreDataManager saveContext];
+    [self.AudioTable reloadData];
 }
 
 void finishPlaySoundCallBack(SystemSoundID sound_id, void *user_data){
     NSLog(@"finish playing");
 }
+
+#pragma mark - TextBox
 
 - (void) textFieldDidBeginEditing:(UITextField *)textField{
     NSTimeInterval animationDuration = 1.0f;
@@ -171,5 +210,7 @@ void finishPlaySoundCallBack(SystemSoundID sound_id, void *user_data){
     [textField resignFirstResponder];
     return YES;
 }
+
+
 
 @end

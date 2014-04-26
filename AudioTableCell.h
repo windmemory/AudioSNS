@@ -11,8 +11,8 @@
 @interface AudioTableCell : UITableViewCell
 @property (weak, nonatomic) IBOutlet UILabel *Postsname;
 @property (weak, nonatomic) IBOutlet UILabel *AudioFileName;
+@property (weak, nonatomic) IBOutlet UIButton *PlayButton;
 
-- (IBAction)PlayThisAudio:(id)sender;
 
 
 @end

@@ -50,6 +50,19 @@
                                 <color key="textColor" red="0.062745098039215685" green="0.63529411764705879" blue="0.8901960784313725" alpha="1" colorSpace="calibratedRGB"/>
                                 <nil key="highlightedColor"/>
                             </label>
+                            <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="FqV-Sw-QO6">
+                                <rect key="frame" x="83" y="451" width="155" height="63"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                <color key="backgroundColor" red="0.13333334028720856" green="0.63921570777893066" blue="0.87843143939971924" alpha="1" colorSpace="deviceRGB"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="31"/>
+                                <state key="normal" title="STOP">
+                                    <color key="titleColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                                    <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
+                                </state>
+                                <connections>
+                                    <action selector="SystemStop:" destination="vXZ-lx-hvc" eventType="touchUpInside" id="nyK-nZ-Tt0"/>
+                                </connections>
+                            </button>
                         </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
                     </view>
@@ -62,6 +75,7 @@
                     </navigationItem>
                     <connections>
                         <outlet property="StartButton" destination="cmu-Eb-nFp" id="VPd-BB-SjM"/>
+                        <outlet property="StopButton" destination="FqV-Sw-QO6" id="xtA-Be-c0F"/>
                         <outlet property="Title" destination="Ws6-xc-fwh" id="Fh6-qh-zz8"/>
                     </connections>
                 </viewController>

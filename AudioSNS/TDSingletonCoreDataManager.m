@@ -9,14 +9,12 @@
 #import "TDSingletonCoreDataManager.h"
 #import <CoreData/CoreData.h>
 
-
 @interface TDSingletonCoreDataManager () {
     NSManagedObjectContext *_managedObjectContext;
     NSManagedObjectModel *_managedObjectModel;
     NSPersistentStoreCoordinator *_persistentStoreCoordinator;
 }
 @end
-
 
 @implementation TDSingletonCoreDataManager
 

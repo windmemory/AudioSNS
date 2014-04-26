@@ -16,6 +16,7 @@
 - (IBAction)Record:(id)sender;
 - (IBAction)Stop:(id)sender;
 
+@property (nonatomic, strong) NSManagedObjectContext *context;
 
 @property AVAudioRecorder *recorder;
 @property AVAudioPlayer *player;
