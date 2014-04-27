@@ -19,7 +19,7 @@
 @property (nonatomic, strong) NSManagedObjectContext *context;
 
 @property AVAudioRecorder *recorder;
-@property AVAudioPlayer *player;
+@property AVAudioPlayer* player;
 @property (weak, nonatomic) IBOutlet UITableView *AudioTable;
 @property (nonatomic) NSUserDefaults *defaults;
 @property (weak, nonatomic) IBOutlet UITextField *NameBox;

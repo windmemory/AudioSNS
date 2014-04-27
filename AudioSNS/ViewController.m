@@ -28,12 +28,15 @@ typedef enum{
     isSpeakingShareInstruction,
     isSpeakingNewPostInstruction,
     SoundEffectFinishSpeakPost,
-    SoundEffectdefault
+    SoundEffectdefault,
+    Commenting,
+    Sharing,
+    WrongCommend
 }Status;
 
 @interface ViewController ()
 
-
+@property (nonatomic) NSTimer *SilenceTimer;
 @property (nonatomic) int NumberofPostisPlaying;
 @property (nonatomic) Status status;
 @property (nonatomic) UILabel *StatusLabel;
@@ -60,30 +63,14 @@ typedef enum{
     _NumberofPostisPlaying = 0;
     
     [self.openEarsEventsObserver setDelegate:self];
-    NSError *error = nil;
-    AVAudioSession *audiosession = [AVAudioSession sharedInstance];
-    [audiosession setCategory:AVAudioSessionCategoryPlayAndRecord error:&error];
-    [audiosession setActive:YES error:nil];
     
-    NSError *dataerror;
-    NSFetchRequest *fetchRequest = [[NSFetchRequest alloc] init];
-    [fetchRequest setReturnsObjectsAsFaults:NO];
-    NSEntityDescription *entity = [NSEntityDescription entityForName:@"Posts" inManagedObjectContext:[TDSingletonCoreDataManager getManagedObjectContext]];
-    [fetchRequest setEntity:entity];
-    _PostsArray = [NSMutableArray arrayWithArray:[[TDSingletonCoreDataManager
-                                                   getManagedObjectContext] executeFetchRequest:fetchRequest error:&dataerror] ];
-    
-    
-    NSEntityDescription *repliesentity = [NSEntityDescription entityForName:@"Replies" inManagedObjectContext:[TDSingletonCoreDataManager getManagedObjectContext]];
-    [fetchRequest setEntity:repliesentity];
-    _Replies = [NSMutableArray arrayWithArray:[[TDSingletonCoreDataManager getManagedObjectContext] executeFetchRequest:fetchRequest error:&dataerror]];
+    [self initialdata];
     
     
     LanguageModelGenerator *lmGenerator = [[LanguageModelGenerator alloc] init];
     NSArray *words = [NSArray arrayWithObjects:@"COMMENT", @"SHARE", @"YES", @"NO", @"MESSAGE", @"POSTS", @"MAKE",@"POST", nil];
     NSString *name = @"NameIWantForMyLanguageModelFiles";
     NSError *err = [lmGenerator generateLanguageModelFromArray:words withFilesNamed:name forAcousticModelAtPath:[AcousticModel pathToModel:@"AcousticModelEnglish"]]; // Change "AcousticModelEnglish" to "AcousticModelSpanish" to create a Spanish language model instead of an English one.
-    
     
     NSDictionary *languageGeneratorResults = nil;
     
@@ -101,18 +88,32 @@ typedef enum{
     self.pathToDynamicallyGeneratedLanguageModel = lmPath;
     self.pathToDynamicallyGeneratedDictionary = dicPath;
     
-//--------------record setting not use for now------------------------------------------------
-//    NSDictionary *recordSetting = [NSDictionary dictionaryWithObjectsAndKeys:[NSNumber numberWithInt:AVAudioQualityMedium],AVEncoderAudioQualityKey,[NSNumber numberWithInt:16],AVEncoderBitRateKey,[NSNumber numberWithInt:2],AVNumberOfChannelsKey,[NSNumber numberWithFloat:44100.0],AVSampleRateKey, nil];
-//    NSURL *url = [NSURL fileURLWithPath:[NSString stringWithFormat:@"%@/record.caf",[[NSBundle mainBundle] resourcePath]]];
-//--------------------------------------------------------------------------------------------
-    
-    
     
     [self.fliteController say:[NSString stringWithFormat:@"Welcome to Voice based SNS, press START button to start"] withVoice:self.slt];
     self.StartButton.hidden = NO;
     
     _status = isStart;
     
+}
+
+- (void) initialdata{
+    NSError *dataerror;
+    NSFetchRequest *fetchRequest = [[NSFetchRequest alloc] init];
+    [fetchRequest setReturnsObjectsAsFaults:NO];
+    NSEntityDescription *entity = [NSEntityDescription entityForName:@"Posts" inManagedObjectContext:[TDSingletonCoreDataManager getManagedObjectContext]];
+    [fetchRequest setEntity:entity];
+    _PostsArray = [NSMutableArray arrayWithArray:[[TDSingletonCoreDataManager
+                                                   getManagedObjectContext] executeFetchRequest:fetchRequest error:&dataerror] ];
+    
+    
+    NSEntityDescription *repliesentity = [NSEntityDescription entityForName:@"Replies" inManagedObjectContext:[TDSingletonCoreDataManager getManagedObjectContext]];
+    [fetchRequest setEntity:repliesentity];
+    _Replies = [NSMutableArray arrayWithArray:[[TDSingletonCoreDataManager getManagedObjectContext] executeFetchRequest:fetchRequest error:&dataerror]];
+}
+
+- (void)viewDidAppear:(BOOL)animated{
+    [self initialdata];
+    NSLog(@"%ld", [_PostsArray count]);
 }
 
 - (void) prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender{
@@ -165,44 +166,7 @@ typedef enum{
     if ([self.pocketphinxController isListening]) {
         [self.pocketphinxController stopListening];
     }
-}
-
-#pragma mark - Read Posts and Read instruction
-
-- (void) ReadStatus{
-    NSLog(@"%ld",[_PostsArray count]);
-    if ([_PostsArray count] == 0) {
-        [self StopSystem];
-        [self.fliteController say:@"You don't have any friends' posts in your timeline" withVoice:slt];
-        self.StopButton.hidden = YES;
-        self.Title.hidden = NO;
-        self.StartButton.hidden = NO;
-        _StatusLabel.hidden = YES;
-        _shimmeringView.hidden = YES;
-    }else{
-        Posts *onepost = _PostsArray[_NumberofPostisPlaying];
-        _status = isSpeakingNameofPost;
-        [self.fliteController say:[NSString stringWithFormat:@"%@ posted a status",onepost.authorname] withVoice:slt];
-    }
-}
-- (void) fliteDidFinishSpeaking {
-	NSLog(@"Flite has finished speaking"); // Log it.
-    NSError *error;
-    
-    if (_status == isSpeakingNameofPost) {
-        Posts *onepost = _PostsArray[_NumberofPostisPlaying];
-        self.audioplayer = [[AVAudioPlayer alloc]initWithContentsOfURL:onepost.posturl error:&error];
-        [self.audioplayer setDelegate:self];
-        [self.audioplayer play];
-        return;
-    }else if(_status == isSpeakingGeneralInstruction){
-        [self startlistening];
-        return;
-    }
-    
-//    if ((_NumberofPostisPlaying+1) < [_PostsArray count]) {
-//        _NumberofPostisPlaying ++;
-//    }
+    _status = isStart;
 }
 
 - (FliteController *)fliteController{
@@ -235,6 +199,24 @@ typedef enum{
     return pocketphinxController;
 }
 
+#pragma mark - Read Posts and Read instruction
+
+- (void) ReadStatus{
+    if ([_PostsArray count] == 0) {
+        [self StopSystem];
+        [self.fliteController say:@"You don't have any friends' posts in your timeline" withVoice:slt];
+        self.StopButton.hidden = YES;
+        self.Title.hidden = NO;
+        self.StartButton.hidden = NO;
+        _StatusLabel.hidden = YES;
+        _shimmeringView.hidden = YES;
+    }else{
+        Posts *onepost = _PostsArray[_NumberofPostisPlaying];
+        _status = isSpeakingNameofPost;
+        [self.fliteController say:[NSString stringWithFormat:@"%@ posted a status",onepost.authorname] withVoice:slt];
+    }
+}
+
 - (void) startlistening{
     [self.pocketphinxController startListeningWithLanguageModelAtPath:self.pathToDynamicallyGeneratedLanguageModel dictionaryAtPath:self.pathToDynamicallyGeneratedDictionary acousticModelAtPath:[AcousticModel pathToModel:@"AcousticModelEnglish"] languageModelIsJSGF:FALSE];
     
@@ -250,22 +232,59 @@ typedef enum{
     NSInteger score = [recognitionScore integerValue];
     
     if ( score <= -1000) {
-        NSLog(@"invalid command with word: %@, score: %@",hypothesis,recognitionScore);
+        _status = WrongCommend;
         [self.fliteController say:@"Wrong command, please try again" withVoice:slt];
     }
-    else
+    else if (_status == isSpeakingGeneralInstruction){
         NSLog(@"Command %@",hypothesis);
-    
+        if ([hypothesis isEqualToString:@"COMMENT"]) {
+            _status = Commenting;
+            [self.pocketphinxController stopListening];
+            [self CommentPosts];
+            NSLog(@"comment");
+        }
+    }
 }
 
 - (void)audioPlayerDidFinishPlaying:(AVAudioPlayer *)player successfully:(BOOL)flag {
     
     _status = isSpeakingGeneralInstruction;
-    
+    [self startlistening];
     [self.fliteController say:@"Say Comment to make a comment on this post. share to share this post. continue to continue to next post or post to make a new post on your own timeline" withVoice:slt];
     
 }
 
+- (void) fliteDidFinishSpeaking {
+	NSLog(@"Flite has finished speaking"); // Log it.
+    NSError *error;
+    
+    if (_status == isSpeakingNameofPost) {
+        Posts *onepost = _PostsArray[_NumberofPostisPlaying];
+        self.audioplayer = [[AVAudioPlayer alloc]initWithContentsOfURL:onepost.posturl error:&error];
+        [self.audioplayer setDelegate:self];
+        [self.audioplayer play];
+        return;
+    }else if(_status == isSpeakingGeneralInstruction){
+        [self.pocketphinxController resumeRecognition];
+        return;
+    }else if(_status == WrongCommend){
+        [self.pocketphinxController resumeRecognition];
+    }
+    //    if ((_NumberofPostisPlaying+1) < [_PostsArray count]) {
+    //        _NumberofPostisPlaying ++;
+    //    }
+}
+
+- (void)CommentPosts{
+    NSError *error;
+    NSDictionary *recordSetting = [NSDictionary dictionaryWithObjectsAndKeys:[NSNumber numberWithInt:AVAudioQualityMedium],AVEncoderAudioQualityKey,[NSNumber numberWithInt:16],AVEncoderBitRateKey,[NSNumber numberWithInt:2],AVNumberOfChannelsKey,[NSNumber numberWithFloat:44100.0],AVSampleRateKey, nil];
+    NSURL *url = [NSURL fileURLWithPath:[NSString stringWithFormat:@"%@/record.caf",[[NSBundle mainBundle] resourcePath]]];
+    self.audiorecorder = [[AVAudioRecorder alloc]initWithURL:url settings:recordSetting error:&error];
+    
+    [self.fliteController say:@"Please comment" withVoice:slt];
+    
+//    self.audiorecorder;
+}
 
 #pragma mark - SpeechRecognition
 - (void) pocketsphinxDidStartCalibration {
@@ -274,6 +293,7 @@ typedef enum{
 
 - (void) pocketsphinxDidCompleteCalibration {
 	NSLog(@"Pocketsphinx calibration is complete.");
+    [self.pocketphinxController suspendRecognition];
 }
 
 - (void) pocketsphinxDidStartListening {

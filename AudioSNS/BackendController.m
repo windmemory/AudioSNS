@@ -115,6 +115,7 @@
 
 
 
+
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section{
     return [_PostsArray count];
 }
@@ -153,6 +154,7 @@
     
     _count = [self.defaults integerForKey:@"count"];
     _recordurl = [NSURL fileURLWithPath:[NSString stringWithFormat:@"%@/Record%ld.caf",[[NSBundle mainBundle] resourcePath],_count]];
+    
     
     NSError *error = nil;
     
