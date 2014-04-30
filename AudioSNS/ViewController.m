@@ -18,6 +18,8 @@
 #import <CoreData/CoreData.h>
 #import "TDSingletonCoreDataManager.h"
 #import "Posts.h"
+#import "Mypost.h"
+
 
 typedef enum{
     isStart,
@@ -31,7 +33,8 @@ typedef enum{
     SoundEffectdefault,
     Commenting,
     Sharing,
-    WrongCommend
+    WrongCommend,
+    Newposting
 }Status;
 
 @interface ViewController ()
@@ -41,6 +44,13 @@ typedef enum{
 @property (nonatomic) Status status;
 @property (nonatomic) UILabel *StatusLabel;
 @property (nonatomic) FBShimmeringView *shimmeringView;
+@property (nonatomic) NSUserDefaults *defaults;
+@property (nonatomic) SystemSoundID sf1;
+@property (nonatomic) SystemSoundID sf2;
+@property (nonatomic) SystemSoundID sf3;
+@property (nonatomic) SystemSoundID sf4;
+@property (nonatomic) SystemSoundID sf5;
+@property (nonatomic) SystemSoundID sf6;
 @end
 
 @implementation ViewController
@@ -66,9 +76,10 @@ typedef enum{
     
     [self initialdata];
     
+    self.defaults = [NSUserDefaults standardUserDefaults];
     
     LanguageModelGenerator *lmGenerator = [[LanguageModelGenerator alloc] init];
-    NSArray *words = [NSArray arrayWithObjects:@"COMMENT", @"SHARE", @"YES", @"NO", @"MESSAGE", @"POSTS", @"MAKE",@"POST", nil];
+    NSArray *words = [NSArray arrayWithObjects:@"COMMENT", @"SHARE", @"CONFIRM", @"CANCEL", @"NEW", @"MAKE",@"POST", nil];
     NSString *name = @"NameIWantForMyLanguageModelFiles";
     NSError *err = [lmGenerator generateLanguageModelFromArray:words withFilesNamed:name forAcousticModelAtPath:[AcousticModel pathToModel:@"AcousticModelEnglish"]]; // Change "AcousticModelEnglish" to "AcousticModelSpanish" to create a Spanish language model instead of an English one.
     
@@ -97,6 +108,8 @@ typedef enum{
 }
 
 - (void) initialdata{
+    
+//------------------------------initialize core data-----------------------------------------------
     NSError *dataerror;
     NSFetchRequest *fetchRequest = [[NSFetchRequest alloc] init];
     [fetchRequest setReturnsObjectsAsFaults:NO];
@@ -109,6 +122,25 @@ typedef enum{
     NSEntityDescription *repliesentity = [NSEntityDescription entityForName:@"Replies" inManagedObjectContext:[TDSingletonCoreDataManager getManagedObjectContext]];
     [fetchRequest setEntity:repliesentity];
     _Replies = [NSMutableArray arrayWithArray:[[TDSingletonCoreDataManager getManagedObjectContext] executeFetchRequest:fetchRequest error:&dataerror]];
+    
+//--------------------------Register Sound Effect in the system--------------------------------------
+    
+    NSURL *soundurl = [NSURL fileURLWithPath:[[NSBundle mainBundle]pathForResource:@"sf1" ofType:@"mp3"]];
+    AudioServicesCreateSystemSoundID((__bridge CFURLRef)soundurl, &_sf1);
+    soundurl = [NSURL fileURLWithPath:[[NSBundle mainBundle]pathForResource:@"sf2" ofType:@"mp3"]];
+    AudioServicesCreateSystemSoundID((__bridge CFURLRef)soundurl, &_sf2);
+    soundurl = [NSURL fileURLWithPath:[[NSBundle mainBundle]pathForResource:@"sf3" ofType:@"mp3"]];
+    AudioServicesCreateSystemSoundID((__bridge CFURLRef)soundurl, &_sf3);
+    soundurl = [NSURL fileURLWithPath:[[NSBundle mainBundle]pathForResource:@"sf4" ofType:@"mp3"]];
+    AudioServicesCreateSystemSoundID((__bridge CFURLRef)soundurl, &_sf4);
+    soundurl = [NSURL fileURLWithPath:[[NSBundle mainBundle]pathForResource:@"sf5" ofType:@"mp3"]];
+    AudioServicesCreateSystemSoundID((__bridge CFURLRef)soundurl, &_sf5);
+    soundurl = [NSURL fileURLWithPath:[[NSBundle mainBundle]pathForResource:@"sf6" ofType:@"mp3"]];
+    AudioServicesCreateSystemSoundID((__bridge CFURLRef)soundurl, &_sf6);
+    
+    
+//    AudioServicesAddSystemSoundCompletion(SF1, NULL, NULL, NULL, NULL);
+//    AudioServicesPlaySystemSound(_sf1);
 }
 
 - (void)viewDidAppear:(BOOL)animated{
@@ -167,6 +199,7 @@ typedef enum{
         [self.pocketphinxController stopListening];
     }
     _status = isStart;
+    _StatusLabel.text = @"SPEAKING";
 }
 
 - (FliteController *)fliteController{
@@ -234,6 +267,7 @@ typedef enum{
     if ( score <= -1000) {
         _status = WrongCommend;
         [self.fliteController say:@"Wrong command, please try again" withVoice:slt];
+        NSLog(@"%@, %@",hypothesis,recognitionScore);
     }
     else if (_status == isSpeakingGeneralInstruction){
         NSLog(@"Command %@",hypothesis);
@@ -242,7 +276,18 @@ typedef enum{
             [self.pocketphinxController stopListening];
             [self CommentPosts];
             NSLog(@"comment");
+        }else if ([hypothesis isEqualToString:@"SHARE"]){
+            _status = Sharing;
+            [self.pocketphinxController stopListening];
+            [self.fliteController say:@"Do you want to share? say confirm or cancel" withVoice:slt];
+            _StatusLabel.text = @"SHARING";
+        }else if ([hypothesis isEqualToString:@"NEW POST"]){
+            _status = Newposting;
+            _StatusLabel.text = @"NEWPOST";
+            
         }
+    }else if (_status == Commenting){
+        
     }
 }
 
@@ -252,38 +297,75 @@ typedef enum{
     [self startlistening];
     [self.fliteController say:@"Say Comment to make a comment on this post. share to share this post. continue to continue to next post or post to make a new post on your own timeline" withVoice:slt];
     
+    
 }
 
 - (void) fliteDidFinishSpeaking {
 	NSLog(@"Flite has finished speaking"); // Log it.
-    NSError *error;
+    
     
     if (_status == isSpeakingNameofPost) {
-        Posts *onepost = _PostsArray[_NumberofPostisPlaying];
-        self.audioplayer = [[AVAudioPlayer alloc]initWithContentsOfURL:onepost.posturl error:&error];
-        [self.audioplayer setDelegate:self];
-        [self.audioplayer play];
-        return;
+        [self saypost];
     }else if(_status == isSpeakingGeneralInstruction){
-        [self.pocketphinxController resumeRecognition];
-        return;
+        [self finishGeneralInstruction];
     }else if(_status == WrongCommend){
-        [self.pocketphinxController resumeRecognition];
+        [self finishGeneralInstruction];
+    }else if(_status == Commenting){
+        
     }
     //    if ((_NumberofPostisPlaying+1) < [_PostsArray count]) {
     //        _NumberofPostisPlaying ++;
     //    }
 }
 
+-(void) saypost{
+    NSError *error;
+    Posts *onepost = _PostsArray[_NumberofPostisPlaying];
+    self.audioplayer = [[AVAudioPlayer alloc]initWithContentsOfURL:onepost.posturl error:&error];
+    [self.audioplayer setDelegate:self];
+    [self.audioplayer play];
+}
+
+-(void) finishGeneralInstruction{
+    AudioServicesPlaySystemSound(_sf1);
+    [self.pocketphinxController resumeRecognition];
+}
+
+
+
 - (void)CommentPosts{
     NSError *error;
+    NSInteger count = [self.defaults integerForKey:@"count"];
+    NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
+    NSString *documentsDirectory = [paths objectAtIndex:0];
+    NSURL *recordurl = [NSURL fileURLWithPath:[NSString stringWithFormat:@"%@/Record%ld.caf",documentsDirectory, count]];
     NSDictionary *recordSetting = [NSDictionary dictionaryWithObjectsAndKeys:[NSNumber numberWithInt:AVAudioQualityMedium],AVEncoderAudioQualityKey,[NSNumber numberWithInt:16],AVEncoderBitRateKey,[NSNumber numberWithInt:2],AVNumberOfChannelsKey,[NSNumber numberWithFloat:44100.0],AVSampleRateKey, nil];
-    NSURL *url = [NSURL fileURLWithPath:[NSString stringWithFormat:@"%@/record.caf",[[NSBundle mainBundle] resourcePath]]];
-    self.audiorecorder = [[AVAudioRecorder alloc]initWithURL:url settings:recordSetting error:&error];
+    self.audiorecorder = [[AVAudioRecorder alloc]initWithURL:recordurl settings:recordSetting error:&error];
+    AVAudioSession *audioSession = [AVAudioSession sharedInstance];
+    [audioSession setCategory:AVAudioSessionCategoryPlayAndRecord withOptions:AVAudioSessionCategoryOptionDefaultToSpeaker error:nil];
+    [audioSession setActive:YES error:nil];
     
-    [self.fliteController say:@"Please comment" withVoice:slt];
+    if ([self.audiorecorder prepareToRecord] == 1){
+        [self.fliteController say:@"Please comment" withVoice:slt];
+        [self.audiorecorder record];
+        [self.defaults setInteger:(count+1) forKey:@"count"];
+        [self.defaults synchronize];
+        Mypost *newposts = [Mypost GenerateMyPost];
+        newposts.url = recordurl;
+        
+        [TDSingletonCoreDataManager saveContext];
+        
+        
+//        _SilenceTimer = [NSTimer scheduledTimerWithTimeInterval:1/16 invocation:invocation repeats:YES];
+        
+    }
+    
     
 //    self.audiorecorder;
+}
+
+- (void)updateLevels{
+    
 }
 
 #pragma mark - SpeechRecognition
@@ -343,7 +425,7 @@ typedef enum{
 }
 
 - (void) initializashimmeringview{
-    _shimmeringView = [[FBShimmeringView alloc] initWithFrame:CGRectMake(0, 220, 320, 150)];
+    _shimmeringView = [[FBShimmeringView alloc] initWithFrame:CGRectMake(0, 150, 320, 150)];
     NSLog(@"%@",self.view);
     [self.view addSubview:_shimmeringView];
     

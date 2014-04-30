@@ -192,7 +192,7 @@
     }
     [self.defaults setInteger:_count+1 forKey:@"count"];
     [self.defaults synchronize];
-    Posts *newposts = [Posts userWithRawDictionary];
+    Posts *newposts = [Posts GenerateNewPost];
     newposts.authorname = self.NameBox.text;
     newposts.posturl = _recordurl;
     [_PostsArray addObject:newposts];

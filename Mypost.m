@@ -1,29 +1,26 @@
 //
-//  Replies.m
+//  Mypost.m
 //  AudioSNS
 //
 //  Created by Gao Yuan on 4/30/14.
 //  Copyright (c) 2014 Gao Yuan. All rights reserved.
 //
 
+#import "Mypost.h"
 #import "Replies.h"
-#import "Posts.h"
 #import "TDSingletonCoreDataManager.h"
 
-@implementation Replies
+@implementation Mypost
 
-@dynamic author;
-@dynamic messageurl;
-@dynamic postsurl;
-@dynamic replyofpost;
-@dynamic replytomypost;
+@dynamic url;
+@dynamic relationship;
 
-+ (instancetype)GenerateNewReply
++ (instancetype)GenerateMyPost
 {
     NSManagedObjectContext *context = [TDSingletonCoreDataManager getManagedObjectContext];
-    Replies *reply = [NSEntityDescription insertNewObjectForEntityForName:@"Posts"
+    Mypost *posts = [NSEntityDescription insertNewObjectForEntityForName:@"Posts"
                                                  inManagedObjectContext:context];
-    return reply;
+    return posts;
 }
 
 @end

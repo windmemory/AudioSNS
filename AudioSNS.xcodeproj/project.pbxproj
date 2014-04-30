@@ -25,10 +25,16 @@
 		30A0B6BF18EF393A00E5AA2B /* AudioSNSTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 30A0B6BE18EF393A00E5AA2B /* AudioSNSTests.m */; };
 		30A992761905A5A3006FE719 /* BackendController.m in Sources */ = {isa = PBXBuildFile; fileRef = 30A992751905A5A3006FE719 /* BackendController.m */; };
 		30CD8EAD190874F4008FA5E2 /* Model.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 30CD8EAB190874F4008FA5E2 /* Model.xcdatamodeld */; };
-		30DB103D1910BE6B00FF45BA /* Oursvince_-_Shine__Celesta__Piano_and_Strings_.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 30DB103C1910BE6B00FF45BA /* Oursvince_-_Shine__Celesta__Piano_and_Strings_.mp3 */; };
+		30DB104019114D4700FF45BA /* Replies.m in Sources */ = {isa = PBXBuildFile; fileRef = 30DB103F19114D4700FF45BA /* Replies.m */; };
+		30DB104319114D4800FF45BA /* Mypost.m in Sources */ = {isa = PBXBuildFile; fileRef = 30DB104219114D4800FF45BA /* Mypost.m */; };
+		30DB104619114D4800FF45BA /* Posts.m in Sources */ = {isa = PBXBuildFile; fileRef = 30DB104519114D4800FF45BA /* Posts.m */; };
+		30E5E8FB1911661C0063922D /* sf1.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 30E5E8F51911661C0063922D /* sf1.mp3 */; };
+		30E5E8FC1911661C0063922D /* sf2.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 30E5E8F61911661C0063922D /* sf2.mp3 */; };
+		30E5E8FD1911661C0063922D /* sf3.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 30E5E8F71911661C0063922D /* sf3.mp3 */; };
+		30E5E8FE1911661C0063922D /* sf4.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 30E5E8F81911661C0063922D /* sf4.mp3 */; };
+		30E5E8FF1911661C0063922D /* sf5.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 30E5E8F91911661C0063922D /* sf5.mp3 */; };
+		30E5E9001911661C0063922D /* sf6.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 30E5E8FA1911661C0063922D /* sf6.mp3 */; };
 		30F1BC691908DB7600EDB639 /* CoreData.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 30F1BC681908DB7600EDB639 /* CoreData.framework */; };
-		30F1BC6C190956C300EDB639 /* Posts.m in Sources */ = {isa = PBXBuildFile; fileRef = 30F1BC6B190956C300EDB639 /* Posts.m */; };
-		30F1BC6F190956C400EDB639 /* Replies.m in Sources */ = {isa = PBXBuildFile; fileRef = 30F1BC6E190956C400EDB639 /* Replies.m */; };
 		30F1BC711909B19300EDB639 /* AudioTableCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 30F1BC701909B19300EDB639 /* AudioTableCell.xib */; };
 		30F1BC741909B22A00EDB639 /* AudioTableCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 30F1BC731909B22A00EDB639 /* AudioTableCell.m */; };
 		30FA457D18F3C26E003C937A /* AcousticModelEnglish.bundle in Resources */ = {isa = PBXBuildFile; fileRef = 30FA457918F3C26E003C937A /* AcousticModelEnglish.bundle */; };
@@ -76,12 +82,19 @@
 		30A992741905A5A3006FE719 /* BackendController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BackendController.h; sourceTree = "<group>"; };
 		30A992751905A5A3006FE719 /* BackendController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = BackendController.m; sourceTree = "<group>"; };
 		30CD8EAC190874F4008FA5E2 /* Model.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = Model.xcdatamodel; sourceTree = "<group>"; };
-		30DB103C1910BE6B00FF45BA /* Oursvince_-_Shine__Celesta__Piano_and_Strings_.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = "Oursvince_-_Shine__Celesta__Piano_and_Strings_.mp3"; sourceTree = "<group>"; };
+		30DB103E19114D4700FF45BA /* Replies.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Replies.h; sourceTree = "<group>"; };
+		30DB103F19114D4700FF45BA /* Replies.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Replies.m; sourceTree = "<group>"; };
+		30DB104119114D4800FF45BA /* Mypost.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Mypost.h; sourceTree = "<group>"; };
+		30DB104219114D4800FF45BA /* Mypost.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Mypost.m; sourceTree = "<group>"; };
+		30DB104419114D4800FF45BA /* Posts.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Posts.h; sourceTree = "<group>"; };
+		30DB104519114D4800FF45BA /* Posts.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Posts.m; sourceTree = "<group>"; };
+		30E5E8F51911661C0063922D /* sf1.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = sf1.mp3; sourceTree = "<group>"; };
+		30E5E8F61911661C0063922D /* sf2.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = sf2.mp3; sourceTree = "<group>"; };
+		30E5E8F71911661C0063922D /* sf3.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = sf3.mp3; sourceTree = "<group>"; };
+		30E5E8F81911661C0063922D /* sf4.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = sf4.mp3; sourceTree = "<group>"; };
+		30E5E8F91911661C0063922D /* sf5.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = sf5.mp3; sourceTree = "<group>"; };
+		30E5E8FA1911661C0063922D /* sf6.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = sf6.mp3; sourceTree = "<group>"; };
 		30F1BC681908DB7600EDB639 /* CoreData.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreData.framework; path = System/Library/Frameworks/CoreData.framework; sourceTree = SDKROOT; };
-		30F1BC6A190956C300EDB639 /* Posts.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Posts.h; sourceTree = "<group>"; };
-		30F1BC6B190956C300EDB639 /* Posts.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Posts.m; sourceTree = "<group>"; };
-		30F1BC6D190956C400EDB639 /* Replies.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Replies.h; sourceTree = "<group>"; };
-		30F1BC6E190956C400EDB639 /* Replies.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Replies.m; sourceTree = "<group>"; };
 		30F1BC701909B19300EDB639 /* AudioTableCell.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = AudioTableCell.xib; sourceTree = "<group>"; };
 		30F1BC721909B22A00EDB639 /* AudioTableCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = AudioTableCell.h; path = ../AudioTableCell.h; sourceTree = "<group>"; };
 		30F1BC731909B22A00EDB639 /* AudioTableCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = AudioTableCell.m; path = ../AudioTableCell.m; sourceTree = "<group>"; };
@@ -167,7 +180,7 @@
 		30A0B69918EF393A00E5AA2B /* AudioSNS */ = {
 			isa = PBXGroup;
 			children = (
-				30DB103C1910BE6B00FF45BA /* Oursvince_-_Shine__Celesta__Piano_and_Strings_.mp3 */,
+				30E5E8F41911661C0063922D /* sound effect */,
 				30F1BC721909B22A00EDB639 /* AudioTableCell.h */,
 				30F1BC731909B22A00EDB639 /* AudioTableCell.m */,
 				3091B2001908AF0500CA93E9 /* TDSingletonCoreDataManager.h */,
@@ -218,13 +231,28 @@
 		30CD8EB41908785A008FA5E2 /* Model */ = {
 			isa = PBXGroup;
 			children = (
-				30F1BC6D190956C400EDB639 /* Replies.h */,
-				30F1BC6E190956C400EDB639 /* Replies.m */,
-				30F1BC6A190956C300EDB639 /* Posts.h */,
-				30F1BC6B190956C300EDB639 /* Posts.m */,
 				30CD8EAB190874F4008FA5E2 /* Model.xcdatamodeld */,
+				30DB104419114D4800FF45BA /* Posts.h */,
+				30DB104519114D4800FF45BA /* Posts.m */,
+				30DB104119114D4800FF45BA /* Mypost.h */,
+				30DB104219114D4800FF45BA /* Mypost.m */,
+				30DB103E19114D4700FF45BA /* Replies.h */,
+				30DB103F19114D4700FF45BA /* Replies.m */,
 			);
 			name = Model;
+			sourceTree = "<group>";
+		};
+		30E5E8F41911661C0063922D /* sound effect */ = {
+			isa = PBXGroup;
+			children = (
+				30E5E8F51911661C0063922D /* sf1.mp3 */,
+				30E5E8F61911661C0063922D /* sf2.mp3 */,
+				30E5E8F71911661C0063922D /* sf3.mp3 */,
+				30E5E8F81911661C0063922D /* sf4.mp3 */,
+				30E5E8F91911661C0063922D /* sf5.mp3 */,
+				30E5E8FA1911661C0063922D /* sf6.mp3 */,
+			);
+			path = "sound effect";
 			sourceTree = "<group>";
 		};
 		30FA457818F3C26E003C937A /* Framework */ = {
@@ -316,13 +344,18 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				30DB103D1910BE6B00FF45BA /* Oursvince_-_Shine__Celesta__Piano_and_Strings_.mp3 in Resources */,
 				30A0B6AC18EF393A00E5AA2B /* Images.xcassets in Resources */,
+				30E5E8FD1911661C0063922D /* sf3.mp3 in Resources */,
 				30FA457E18F3C26E003C937A /* AcousticModelSpanish.bundle in Resources */,
 				30FA457D18F3C26E003C937A /* AcousticModelEnglish.bundle in Resources */,
+				30E5E8FB1911661C0063922D /* sf1.mp3 in Resources */,
+				30E5E8FF1911661C0063922D /* sf5.mp3 in Resources */,
 				30F1BC711909B19300EDB639 /* AudioTableCell.xib in Resources */,
+				30E5E8FC1911661C0063922D /* sf2.mp3 in Resources */,
 				30A0B69E18EF393A00E5AA2B /* InfoPlist.strings in Resources */,
 				30A0B6A718EF393A00E5AA2B /* Main.storyboard in Resources */,
+				30E5E9001911661C0063922D /* sf6.mp3 in Resources */,
+				30E5E8FE1911661C0063922D /* sf4.mp3 in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -374,15 +407,16 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				30F1BC6F190956C400EDB639 /* Replies.m in Sources */,
+				30DB104019114D4700FF45BA /* Replies.m in Sources */,
 				3091B2021908AF0500CA93E9 /* TDSingletonCoreDataManager.m in Sources */,
 				30A0B6AA18EF393A00E5AA2B /* ViewController.m in Sources */,
-				30F1BC6C190956C300EDB639 /* Posts.m in Sources */,
 				30F1BC741909B22A00EDB639 /* AudioTableCell.m in Sources */,
 				30A0B6A418EF393A00E5AA2B /* AppDelegate.m in Sources */,
 				30CD8EAD190874F4008FA5E2 /* Model.xcdatamodeld in Sources */,
 				30A992761905A5A3006FE719 /* BackendController.m in Sources */,
+				30DB104319114D4800FF45BA /* Mypost.m in Sources */,
 				30A0B6A018EF393A00E5AA2B /* main.m in Sources */,
+				30DB104619114D4800FF45BA /* Posts.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
