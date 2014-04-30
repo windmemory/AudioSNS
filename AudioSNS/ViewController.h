@@ -38,7 +38,8 @@
 @property (nonatomic) AVAudioRecorder *audiorecorder;
 @property (nonatomic) AVAudioPlayer *audioplayer;
 @property (nonatomic) NSArray *PostsArray;
-@property (nonatomic) NSArray *Replies;
+@property (nonatomic) NSMutableArray *Replies;
+@property (nonatomic) NSMutableArray *myposts;
 @property (weak, nonatomic) IBOutlet UILabel *Title;
 @property (weak, nonatomic) IBOutlet UIButton *StartButton;
 @property (weak, nonatomic) IBOutlet UIButton *StopButton;

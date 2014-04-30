@@ -18,7 +18,7 @@
 + (instancetype)GenerateMyPost
 {
     NSManagedObjectContext *context = [TDSingletonCoreDataManager getManagedObjectContext];
-    Mypost *posts = [NSEntityDescription insertNewObjectForEntityForName:@"Posts"
+    Mypost *posts = [NSEntityDescription insertNewObjectForEntityForName:@"MyPosts"
                                                  inManagedObjectContext:context];
     return posts;
 }

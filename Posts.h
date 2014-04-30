@@ -14,7 +14,7 @@
 @interface Posts : NSManagedObject
 
 @property (nonatomic, retain) NSString * authorname;
-@property (nonatomic, retain) id posturl;
+@property (nonatomic, retain) NSURL *posturl;
 @property (nonatomic, retain) NSSet *postofreply;
 @end
 

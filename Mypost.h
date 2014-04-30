@@ -13,7 +13,7 @@
 
 @interface Mypost : NSManagedObject
 
-@property (nonatomic, retain) id url;
+@property (nonatomic, retain) NSURL *url;
 @property (nonatomic, retain) Replies *relationship;
 
 

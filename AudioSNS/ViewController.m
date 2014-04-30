@@ -19,6 +19,7 @@
 #import "TDSingletonCoreDataManager.h"
 #import "Posts.h"
 #import "Mypost.h"
+#import "Replies.h"
 
 
 typedef enum{
@@ -264,12 +265,11 @@ typedef enum{
     
     NSInteger score = [recognitionScore integerValue];
     
-    if ( score <= -1000) {
+    if ( score <= -5000) {
         _status = WrongCommend;
         [self.fliteController say:@"Wrong command, please try again" withVoice:slt];
         NSLog(@"%@, %@",hypothesis,recognitionScore);
-    }
-    else if (_status == isSpeakingGeneralInstruction){
+    }else if (_status == isSpeakingGeneralInstruction){
         NSLog(@"Command %@",hypothesis);
         if ([hypothesis isEqualToString:@"COMMENT"]) {
             _status = Commenting;
@@ -295,7 +295,7 @@ typedef enum{
     
     _status = isSpeakingGeneralInstruction;
     [self startlistening];
-    [self.fliteController say:@"Say Comment to make a comment on this post. share to share this post. continue to continue to next post or post to make a new post on your own timeline" withVoice:slt];
+    [self.fliteController say:@"Say Comment a a a a "/*to make a comment on this post. share to share this post. continue to continue to next post or post to make a new post on your own timeline" */withVoice:slt];
     
     
 }
@@ -327,31 +327,43 @@ typedef enum{
 }
 
 -(void) finishGeneralInstruction{
-    AudioServicesPlaySystemSound(_sf1);
+    AudioServicesPlaySystemSound(_sf2);
     [self.pocketphinxController resumeRecognition];
 }
 
 
 
 - (void)CommentPosts{
+    
+    if (![self.defaults integerForKey:@"Mycount"]) {
+        [self.defaults setInteger:0 forKey:@"Mycount"];
+        [self.defaults synchronize];
+    }
+    
     NSError *error;
-    NSInteger count = [self.defaults integerForKey:@"count"];
+    NSInteger Mycount = [self.defaults integerForKey:@"Mycount"];
     NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
     NSString *documentsDirectory = [paths objectAtIndex:0];
-    NSURL *recordurl = [NSURL fileURLWithPath:[NSString stringWithFormat:@"%@/Record%ld.caf",documentsDirectory, count]];
+    NSURL *recordurl = [NSURL fileURLWithPath:[NSString stringWithFormat:@"%@/MyRecord%ld.caf",documentsDirectory, Mycount]];
     NSDictionary *recordSetting = [NSDictionary dictionaryWithObjectsAndKeys:[NSNumber numberWithInt:AVAudioQualityMedium],AVEncoderAudioQualityKey,[NSNumber numberWithInt:16],AVEncoderBitRateKey,[NSNumber numberWithInt:2],AVNumberOfChannelsKey,[NSNumber numberWithFloat:44100.0],AVSampleRateKey, nil];
     self.audiorecorder = [[AVAudioRecorder alloc]initWithURL:recordurl settings:recordSetting error:&error];
     AVAudioSession *audioSession = [AVAudioSession sharedInstance];
     [audioSession setCategory:AVAudioSessionCategoryPlayAndRecord withOptions:AVAudioSessionCategoryOptionDefaultToSpeaker error:nil];
     [audioSession setActive:YES error:nil];
     
+    
+    
     if ([self.audiorecorder prepareToRecord] == 1){
         [self.fliteController say:@"Please comment" withVoice:slt];
         [self.audiorecorder record];
-        [self.defaults setInteger:(count+1) forKey:@"count"];
+        AudioServicesPlaySystemSound(_sf3);
+        [self.defaults setInteger:(Mycount+1) forKey:@"Mycount"];
         [self.defaults synchronize];
-        Mypost *newposts = [Mypost GenerateMyPost];
-        newposts.url = recordurl;
+        NSLog(@"%ld",Mycount);
+        Replies *reply = [Replies GenerateNewReply];
+        reply.messageurl = recordurl;
+        reply.replyofpost = _PostsArray[_NumberofPostisPlaying];
+        [_Replies addObject:(reply)];
         
         [TDSingletonCoreDataManager saveContext];
         
@@ -375,7 +387,7 @@ typedef enum{
 
 - (void) pocketsphinxDidCompleteCalibration {
 	NSLog(@"Pocketsphinx calibration is complete.");
-    [self.pocketphinxController suspendRecognition];
+//    [self.pocketphinxController suspendRecognition];
 }
 
 - (void) pocketsphinxDidStartListening {
@@ -431,7 +443,7 @@ typedef enum{
     
     _StatusLabel = [[UILabel alloc] initWithFrame:_shimmeringView.bounds];
     _StatusLabel.textAlignment = NSTextAlignmentCenter;
-    _StatusLabel.text = @"Speaking";
+    _StatusLabel.text = @"SPEAKING";
     _StatusLabel.textColor = [UIColor colorWithRed:16.0f/255.0f green:162.0f/255.0f blue:227.0f/255.0f alpha:1.0f];
     _StatusLabel.font = [UIFont fontWithName:@"Helvetica Light" size:36];
     

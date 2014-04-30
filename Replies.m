@@ -21,7 +21,7 @@
 + (instancetype)GenerateNewReply
 {
     NSManagedObjectContext *context = [TDSingletonCoreDataManager getManagedObjectContext];
-    Replies *reply = [NSEntityDescription insertNewObjectForEntityForName:@"Posts"
+    Replies *reply = [NSEntityDescription insertNewObjectForEntityForName:@"Replies"
                                                  inManagedObjectContext:context];
     return reply;
 }
