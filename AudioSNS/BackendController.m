@@ -123,9 +123,13 @@
 - (void) PlayButtonClicked:(UIButton*)sender{
     NSError *error;
     Posts *onepost = _PostsArray[sender.tag];
-    player = [[AVAudioPlayer alloc]initWithContentsOfURL:onepost.posturl error:&error];
     
+//    NSData *songFile = [[NSData alloc] initWithContentsOfURL:onepost.posturl options:NSDataReadingMappedIfSafe error:&error1 ];
+    player = [[AVAudioPlayer alloc]initWithContentsOfURL:onepost.posturl error:&error];
     [player play];
+//    player = [[AVAudioPlayer alloc]initWithContentsOfURL:another error:&error];
+    NSLog(@"%@",player.url);
+    NSLog(@"%@",onepost);
 }
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath{
@@ -153,7 +157,9 @@
 - (IBAction)Record:(id)sender {
     
     _count = [self.defaults integerForKey:@"count"];
-    _recordurl = [NSURL fileURLWithPath:[NSString stringWithFormat:@"%@/Record%ld.caf",[[NSBundle mainBundle] resourcePath],_count]];
+    NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
+    NSString *documentsDirectory = [paths objectAtIndex:0];
+    _recordurl = [NSURL fileURLWithPath:[NSString stringWithFormat:@"%@/Record%ld.caf",documentsDirectory, _count]];
     
     
     NSError *error = nil;
@@ -168,6 +174,10 @@
     }
     
     if (!self.recorder.recording) {
+        AVAudioSession *audioSession = [AVAudioSession sharedInstance];
+        [audioSession setCategory:AVAudioSessionCategoryPlayAndRecord withOptions:AVAudioSessionCategoryOptionDefaultToSpeaker error:nil];
+        [audioSession setActive:YES error:nil];
+        [self.recorder prepareToRecord];
         [self.recorder record];
     }
     

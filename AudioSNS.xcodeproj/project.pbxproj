@@ -25,6 +25,7 @@
 		30A0B6BF18EF393A00E5AA2B /* AudioSNSTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 30A0B6BE18EF393A00E5AA2B /* AudioSNSTests.m */; };
 		30A992761905A5A3006FE719 /* BackendController.m in Sources */ = {isa = PBXBuildFile; fileRef = 30A992751905A5A3006FE719 /* BackendController.m */; };
 		30CD8EAD190874F4008FA5E2 /* Model.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 30CD8EAB190874F4008FA5E2 /* Model.xcdatamodeld */; };
+		30DB103D1910BE6B00FF45BA /* Oursvince_-_Shine__Celesta__Piano_and_Strings_.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 30DB103C1910BE6B00FF45BA /* Oursvince_-_Shine__Celesta__Piano_and_Strings_.mp3 */; };
 		30F1BC691908DB7600EDB639 /* CoreData.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 30F1BC681908DB7600EDB639 /* CoreData.framework */; };
 		30F1BC6C190956C300EDB639 /* Posts.m in Sources */ = {isa = PBXBuildFile; fileRef = 30F1BC6B190956C300EDB639 /* Posts.m */; };
 		30F1BC6F190956C400EDB639 /* Replies.m in Sources */ = {isa = PBXBuildFile; fileRef = 30F1BC6E190956C400EDB639 /* Replies.m */; };
@@ -75,6 +76,7 @@
 		30A992741905A5A3006FE719 /* BackendController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BackendController.h; sourceTree = "<group>"; };
 		30A992751905A5A3006FE719 /* BackendController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = BackendController.m; sourceTree = "<group>"; };
 		30CD8EAC190874F4008FA5E2 /* Model.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = Model.xcdatamodel; sourceTree = "<group>"; };
+		30DB103C1910BE6B00FF45BA /* Oursvince_-_Shine__Celesta__Piano_and_Strings_.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = "Oursvince_-_Shine__Celesta__Piano_and_Strings_.mp3"; sourceTree = "<group>"; };
 		30F1BC681908DB7600EDB639 /* CoreData.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreData.framework; path = System/Library/Frameworks/CoreData.framework; sourceTree = SDKROOT; };
 		30F1BC6A190956C300EDB639 /* Posts.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Posts.h; sourceTree = "<group>"; };
 		30F1BC6B190956C300EDB639 /* Posts.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Posts.m; sourceTree = "<group>"; };
@@ -165,6 +167,7 @@
 		30A0B69918EF393A00E5AA2B /* AudioSNS */ = {
 			isa = PBXGroup;
 			children = (
+				30DB103C1910BE6B00FF45BA /* Oursvince_-_Shine__Celesta__Piano_and_Strings_.mp3 */,
 				30F1BC721909B22A00EDB639 /* AudioTableCell.h */,
 				30F1BC731909B22A00EDB639 /* AudioTableCell.m */,
 				3091B2001908AF0500CA93E9 /* TDSingletonCoreDataManager.h */,
@@ -313,6 +316,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				30DB103D1910BE6B00FF45BA /* Oursvince_-_Shine__Celesta__Piano_and_Strings_.mp3 in Resources */,
 				30A0B6AC18EF393A00E5AA2B /* Images.xcassets in Resources */,
 				30FA457E18F3C26E003C937A /* AcousticModelSpanish.bundle in Resources */,
 				30FA457D18F3C26E003C937A /* AcousticModelEnglish.bundle in Resources */,
