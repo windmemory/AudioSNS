@@ -27,11 +27,6 @@ typedef enum{
     isStart,
     isSpeakingNameofPost,
     isSpeakingGeneralInstruction,
-    isSpeakingCommentInstruction,
-    isSpeakingShareInstruction,
-    isSpeakingNewPostInstruction,
-    SoundEffectFinishSpeakPost,
-    SoundEffectdefault,
     Commenting,
     Sharing,
     Newposting,
@@ -39,6 +34,9 @@ typedef enum{
     confirmShare,
     confirmPost,
     Choosemode,
+    messageSystem,
+    finishMessage,
+    
     WrongCommend = 1 <<20,
 }Status;
 
@@ -46,6 +44,7 @@ typedef enum{
 
 @property (nonatomic) NSTimer *SilenceTimer;
 @property (nonatomic) int NumberofPostisPlaying;
+@property (nonatomic) int numberOfMypost;
 @property (nonatomic) Status status;
 @property (nonatomic) UILabel *StatusLabel;
 @property (nonatomic) FBShimmeringView *shimmeringView;
@@ -159,7 +158,6 @@ static BOOL flag;
 
 - (void)viewDidAppear:(BOOL)animated{
     [self initialdata];
-//    NSLog(@"%ld", [_PostsArray count]);
 }
 
 - (void) prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender{
@@ -220,7 +218,6 @@ static BOOL flag;
         [_SilenceTimer invalidate];
     }
     _status = isStart;
-//    _StatusLabel.text = @"SPEAKING";
     
 }
 
@@ -257,6 +254,11 @@ static BOOL flag;
 
 #pragma mark - Read Posts and Read instruction
 
+- (void) replyMessage{
+    [self.pocketphinxController suspendRecognition];
+    [self.fliteController say:@"In your post" withVoice:slt];
+}
+
 - (void) ReadStatus{
     if ([_PostsArray count] == 0) {
         [self StopSystem];
@@ -283,7 +285,7 @@ static BOOL flag;
     
 }
 
--(void) pocketsphinxDidReceiveHypothesis:(NSString *)hypothesis recognitionScore:(NSString *)recognitionScore utteranceID:(NSString *)utteranceID{
+- (void) pocketsphinxDidReceiveHypothesis:(NSString *)hypothesis recognitionScore:(NSString *)recognitionScore utteranceID:(NSString *)utteranceID{
     
     NSInteger score = [recognitionScore integerValue];
     NSLog(@"%u",_status);
@@ -298,7 +300,17 @@ static BOOL flag;
             [self ReadStatus];
             
         }else if([hypothesis rangeOfString:@"REPLY"].location != NSNotFound){
+            [self.pocketphinxController suspendRecognition];
+            _status = messageSystem;
+            [self replyMessage];
             
+        }else if([hypothesis rangeOfString:@"QUIT"].location != NSNotFound){
+            self.StopButton.hidden = YES;
+            self.Title.hidden = NO;
+            self.StartButton.hidden = NO;
+            _StatusLabel.hidden = YES;
+            _shimmeringView.hidden = YES;
+            [self StopSystem];
         }
 //--------------------Dealing with operation----------------------------------
     }else if (_status == isSpeakingGeneralInstruction){
@@ -310,7 +322,6 @@ static BOOL flag;
             NSLog(@"comment");
         }else if ([hypothesis rangeOfString:@"SHARE"].location != NSNotFound){
             _status = Sharing;
-            
             [self.fliteController say:@"Do you want to share? say confirm or cancel" withVoice:slt];
             _StatusLabel.text = @"SHARING";
         }else if ([hypothesis rangeOfString:@"POST"].location != NSNotFound){
@@ -356,10 +367,12 @@ static BOOL flag;
         
 //------------------Confirm Share---------------------------------------------
         
-    }else if (_status == confirmShare){
+    }else if (_status == Sharing){
         if ([hypothesis rangeOfString:@"CONFIRM"].location != NSNotFound) {
+            _status = confirmShare;
             [self.fliteController say:@"Share Success" withVoice:slt];
         }else if([hypothesis rangeOfString:@"CANCEL"].location != NSNotFound){
+            _status = confirmShare;
             [self.fliteController say:@"canceled" withVoice:slt];
         }else{
             _status = _status^WrongCommend;
@@ -398,16 +411,14 @@ static BOOL flag;
 
 - (void)audioPlayerDidFinishPlaying:(AVAudioPlayer *)player successfully:(BOOL)flag {
     
-    _status = isSpeakingGeneralInstruction;
-//    [self startlistening];
-    [self.fliteController say:@"Say instructions please "/*to make a comment on this post. share to share this post. continue to continue to next post or post to make a new post on your own timeline" */withVoice:slt];
-    
-    
+    if (_status != messageSystem){
+        _status = isSpeakingGeneralInstruction;
+        [self.fliteController say:@"Say instructions please "/*to make a comment on this post. share to share this post. continue to continue to next post or post to make a new post on your own timeline" */withVoice:slt];
+    }
 }
 
 - (void) fliteDidFinishSpeaking {
 	NSLog(@"Flite has finished speaking"); // Log it.
-    
     
     if (_status == isSpeakingNameofPost) {
         [self saypost];
@@ -426,9 +437,11 @@ static BOOL flag;
         [self finishGeneralInstruction];
     }else if (_status == Sharing){
         [self finishGeneralInstruction];
+    }else if (_status == finishMessage){
+        [self chooseMode];
+    }else if (_status == messageSystem){
+        [self previewMypost];
     }
-    
-        
 }
 
 - (void) saypost{
@@ -437,6 +450,26 @@ static BOOL flag;
     self.audioplayer = [[AVAudioPlayer alloc]initWithContentsOfURL:onepost.posturl error:&error];
     [self.audioplayer setDelegate:self];
     [self.audioplayer play];
+}
+
+- (void) previewMypost{
+    Mypost *oneMypost = _myposts[_numberOfMypost];
+    NSError *error;
+    while (oneMypost.relationship == nil) {
+        if (_numberOfMypost == ([_myposts count] - 1)) {
+            _status = finishMessage;
+            [self.fliteController say:@"You don't have meesages" withVoice:slt];
+        }
+        oneMypost = _myposts[++_numberOfMypost];
+    }
+    [self.pocketphinxController suspendRecognition];
+    _audioplayer = [[AVAudioPlayer alloc]initWithContentsOfURL:oneMypost.url error:&error];
+    [_audioplayer play];
+    
+//    if ([_audioplayer isPlaying]) {
+//        [_audioplayer stop];
+//    }
+
 }
 
 - (void) finishGeneralInstruction{
@@ -523,7 +556,6 @@ static BOOL flag;
         totallevel = 0;
         flag = 0;
         _SilenceTimer = [NSTimer scheduledTimerWithTimeInterval:0.2 target:self selector:@selector(updateLevels) userInfo:nil repeats:YES];
-        
     }
 }
 
@@ -558,6 +590,7 @@ static BOOL flag;
             [self.fliteController say:@"Say confirm, cancel or redo" withVoice:slt];
         }
     }
+    NSLog(@"%f",[self.audiorecorder averagePowerForChannel:0]);
 }
 
 
