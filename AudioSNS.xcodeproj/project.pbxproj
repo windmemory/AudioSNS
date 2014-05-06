@@ -37,6 +37,7 @@
 		30F1BC691908DB7600EDB639 /* CoreData.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 30F1BC681908DB7600EDB639 /* CoreData.framework */; };
 		30F1BC711909B19300EDB639 /* AudioTableCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 30F1BC701909B19300EDB639 /* AudioTableCell.xib */; };
 		30F1BC741909B22A00EDB639 /* AudioTableCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 30F1BC731909B22A00EDB639 /* AudioTableCell.m */; };
+		30F97CB2191873F400AFA45F /* MypostController.m in Sources */ = {isa = PBXBuildFile; fileRef = 30F97CB1191873F400AFA45F /* MypostController.m */; };
 		30FA457D18F3C26E003C937A /* AcousticModelEnglish.bundle in Resources */ = {isa = PBXBuildFile; fileRef = 30FA457918F3C26E003C937A /* AcousticModelEnglish.bundle */; };
 		30FA457E18F3C26E003C937A /* AcousticModelSpanish.bundle in Resources */ = {isa = PBXBuildFile; fileRef = 30FA457A18F3C26E003C937A /* AcousticModelSpanish.bundle */; };
 		30FA457F18F3C26E003C937A /* OpenEars.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 30FA457B18F3C26E003C937A /* OpenEars.framework */; };
@@ -98,6 +99,8 @@
 		30F1BC701909B19300EDB639 /* AudioTableCell.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = AudioTableCell.xib; sourceTree = "<group>"; };
 		30F1BC721909B22A00EDB639 /* AudioTableCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = AudioTableCell.h; path = ../AudioTableCell.h; sourceTree = "<group>"; };
 		30F1BC731909B22A00EDB639 /* AudioTableCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = AudioTableCell.m; path = ../AudioTableCell.m; sourceTree = "<group>"; };
+		30F97CB0191873F400AFA45F /* MypostController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = MypostController.h; path = ../MypostController.h; sourceTree = "<group>"; };
+		30F97CB1191873F400AFA45F /* MypostController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = MypostController.m; path = ../MypostController.m; sourceTree = "<group>"; };
 		30FA457918F3C26E003C937A /* AcousticModelEnglish.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; path = AcousticModelEnglish.bundle; sourceTree = "<group>"; };
 		30FA457A18F3C26E003C937A /* AcousticModelSpanish.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; path = AcousticModelSpanish.bundle; sourceTree = "<group>"; };
 		30FA457B18F3C26E003C937A /* OpenEars.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = OpenEars.framework; sourceTree = "<group>"; };
@@ -193,6 +196,8 @@
 				30F1BC701909B19300EDB639 /* AudioTableCell.xib */,
 				30A0B6A818EF393A00E5AA2B /* ViewController.h */,
 				30A0B6A918EF393A00E5AA2B /* ViewController.m */,
+				30F97CB0191873F400AFA45F /* MypostController.h */,
+				30F97CB1191873F400AFA45F /* MypostController.m */,
 				30A0B6AB18EF393A00E5AA2B /* Images.xcassets */,
 				30A0B69A18EF393A00E5AA2B /* Supporting Files */,
 			);
@@ -410,6 +415,7 @@
 				30DB104019114D4700FF45BA /* Replies.m in Sources */,
 				3091B2021908AF0500CA93E9 /* TDSingletonCoreDataManager.m in Sources */,
 				30A0B6AA18EF393A00E5AA2B /* ViewController.m in Sources */,
+				30F97CB2191873F400AFA45F /* MypostController.m in Sources */,
 				30F1BC741909B22A00EDB639 /* AudioTableCell.m in Sources */,
 				30A0B6A418EF393A00E5AA2B /* AppDelegate.m in Sources */,
 				30CD8EAD190874F4008FA5E2 /* Model.xcdatamodeld in Sources */,
@@ -542,10 +548,8 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
-				FRAMEWORK_SEARCH_PATHS = (
-					"$(inherited)",
-					"$(PROJECT_DIR)/Framework",
-				);
+				FRAMEWORK_SEARCH_PATHS = "$(SRCROOT)";
+				"FRAMEWORK_SEARCH_PATHS[arch=*]" = "$(SRCROOT)/Framework";
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "AudioSNS/AudioSNS-Prefix.pch";
 				INFOPLIST_FILE = "AudioSNS/AudioSNS-Info.plist";
@@ -560,10 +564,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
-				FRAMEWORK_SEARCH_PATHS = (
-					"$(inherited)",
-					"$(PROJECT_DIR)/Framework",
-				);
+				FRAMEWORK_SEARCH_PATHS = "$(SRCROOT)";
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "AudioSNS/AudioSNS-Prefix.pch";
 				INFOPLIST_FILE = "AudioSNS/AudioSNS-Info.plist";

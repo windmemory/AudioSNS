@@ -96,7 +96,7 @@
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                         <subviews>
                             <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="W42-CV-y2F">
-                                <rect key="frame" x="203" y="505" width="50" height="30"/>
+                                <rect key="frame" x="148" y="505" width="50" height="30"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                 <state key="normal" title="Record">
                                     <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
@@ -124,18 +124,89 @@
                                     <outlet property="delegate" destination="6OP-gY-vkX" id="mR3-Tz-dBL"/>
                                 </connections>
                             </textField>
+                            <switch opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" on="YES" translatesAutoresizingMaskIntoConstraints="NO" id="eGc-to-Ezl">
+                                <rect key="frame" x="228" y="505" width="51" height="31"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                <color key="onTintColor" red="0.062745098040000002" green="0.63529411759999999" blue="0.89019607840000003" alpha="1" colorSpace="deviceRGB"/>
+                                <connections>
+                                    <action selector="SoundOnlySwitch:" destination="6OP-gY-vkX" eventType="valueChanged" id="yKe-Ty-EHO"/>
+                                </connections>
+                            </switch>
                         </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
                     </view>
-                    <navigationItem key="navigationItem" title="Backend" id="p55-bx-ySh"/>
+                    <toolbarItems/>
+                    <navigationItem key="navigationItem" title="Backend" id="p55-bx-ySh">
+                        <barButtonItem key="rightBarButtonItem" title="Myself" id="5PY-qh-cGc">
+                            <connections>
+                                <segue destination="p4j-yk-ru8" kind="push" id="K9V-dV-nkH"/>
+                            </connections>
+                        </barButtonItem>
+                    </navigationItem>
+                    <simulatedToolbarMetrics key="simulatedBottomBarMetrics"/>
                     <connections>
                         <outlet property="AudioTable" destination="fZh-SL-pE4" id="tRC-i6-a1i"/>
                         <outlet property="NameBox" destination="aE6-4f-UOo" id="RGQ-eT-D2j"/>
+                        <outlet property="soundEffectOnly" destination="eGc-to-Ezl" id="qLt-oZ-iR4"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="G9c-aH-ss1" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
             <point key="canvasLocation" x="-438" y="37"/>
+        </scene>
+        <!--Mypost Controller - Mypost-->
+        <scene sceneID="vyW-uq-VIg">
+            <objects>
+                <viewController id="p4j-yk-ru8" customClass="MypostController" sceneMemberID="viewController">
+                    <layoutGuides>
+                        <viewControllerLayoutGuide type="top" id="aEM-As-yli"/>
+                        <viewControllerLayoutGuide type="bottom" id="rgx-7W-Ltd"/>
+                    </layoutGuides>
+                    <view key="view" contentMode="scaleToFill" id="x8w-aC-VOh">
+                        <rect key="frame" x="0.0" y="0.0" width="320" height="568"/>
+                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                        <subviews>
+                            <textField opaque="NO" clipsSubviews="YES" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="left" contentVerticalAlignment="center" borderStyle="roundedRect" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="5Sl-2N-VjU">
+                                <rect key="frame" x="42" y="492" width="97" height="30"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="14"/>
+                                <textInputTraits key="textInputTraits"/>
+                                <connections>
+                                    <outlet property="delegate" destination="p4j-yk-ru8" id="i0j-nc-S9i"/>
+                                </connections>
+                            </textField>
+                            <tableView clipsSubviews="YES" contentMode="scaleToFill" fixedFrame="YES" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="44" sectionHeaderHeight="22" sectionFooterHeight="22" translatesAutoresizingMaskIntoConstraints="NO" id="avY-C9-QKB">
+                                <rect key="frame" x="20" y="74" width="280" height="402"/>
+                                <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                                <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                                <connections>
+                                    <outlet property="dataSource" destination="p4j-yk-ru8" id="aZw-7e-W9X"/>
+                                    <outlet property="delegate" destination="p4j-yk-ru8" id="YnF-AG-3XU"/>
+                                </connections>
+                            </tableView>
+                            <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="b2X-MJ-Lz5">
+                                <rect key="frame" x="215" y="492" width="46" height="30"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                <state key="normal" title="Button">
+                                    <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
+                                </state>
+                                <connections>
+                                    <action selector="startRecord:" destination="p4j-yk-ru8" eventType="touchDown" id="Qdc-vI-Per"/>
+                                    <action selector="stopRecord:" destination="p4j-yk-ru8" eventType="touchUpInside" id="Eje-Oh-KR7"/>
+                                </connections>
+                            </button>
+                        </subviews>
+                        <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
+                    </view>
+                    <navigationItem key="navigationItem" title="Mypost" id="fd7-0V-4Rj"/>
+                    <connections>
+                        <outlet property="mypostTable" destination="avY-C9-QKB" id="lsA-x2-lWm"/>
+                        <outlet property="nameBox" destination="5Sl-2N-VjU" id="tNM-a3-3lt"/>
+                    </connections>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="G0V-c4-agX" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="62" y="37"/>
         </scene>
     </scenes>
     <simulatedMetricsContainer key="defaultSimulatedMetrics">

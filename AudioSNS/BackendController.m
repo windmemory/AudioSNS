@@ -40,22 +40,17 @@
 {
     [super viewDidLoad];
     
-    _context = [TDSingletonCoreDataManager getManagedObjectContext];
-    
-    _recordSetting = [NSDictionary dictionaryWithObjectsAndKeys:[NSNumber numberWithInt:AVAudioQualityMedium],AVEncoderAudioQualityKey,[NSNumber numberWithInt:16],AVEncoderBitRateKey,[NSNumber numberWithInt:2],AVNumberOfChannelsKey,[NSNumber numberWithFloat:44100.0],AVSampleRateKey, nil];
-    
-    
-//    NSURL *soundurl = [NSURL fileURLWithPath:[[NSBundle mainBundle]pathForResource:@"SF1" ofType:@"mp3"]];
-//    
-//    SystemSoundID SF1;
-//    AudioServicesCreateSystemSoundID((__bridge CFURLRef)soundurl, &SF1);
-//    AudioServicesAddSystemSoundCompletion(SF1, NULL, NULL, finishPlaySoundCallBack, NULL);
-//    AudioServicesPlaySystemSound(SF1);
     [self prepareData];
+    
+    self.soundEffectOnly.on = [self.defaults boolForKey:@"soundonly"];
     
 }
 
 - (void)prepareData{
+    
+    _context = [TDSingletonCoreDataManager getManagedObjectContext];
+    
+    _recordSetting = [NSDictionary dictionaryWithObjectsAndKeys:[NSNumber numberWithInt:AVAudioQualityMedium],AVEncoderAudioQualityKey,[NSNumber numberWithInt:16],AVEncoderBitRateKey,[NSNumber numberWithInt:2],AVNumberOfChannelsKey,[NSNumber numberWithFloat:44100.0],AVSampleRateKey, nil];
     NSError *error;
     NSFetchRequest *fetchRequest = [[NSFetchRequest alloc] init];
     [fetchRequest setReturnsObjectsAsFaults:NO];
@@ -71,17 +66,11 @@
     
     self.defaults = [NSUserDefaults standardUserDefaults];
     
-    if (![self.defaults integerForKey:@"count"]) {
-        [self.defaults setInteger:0 forKey:@"count"];
-        [self.defaults synchronize];
-    }
+//    [self.defaults setBool:self.soundEffectOnly.on forKey:@"soundonly"];
+    
 }
 
 - (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender{
-    if ([segue.identifier isEqualToString:@"Backend"]) {
-        ViewController *mainscreen = segue.destinationViewController;
-        mainscreen.PostsArray = _PostsArray;
-    }
     [player stop];
 }
 
@@ -123,11 +112,8 @@
 - (void) PlayButtonClicked:(UIButton*)sender{
     NSError *error;
     Posts *onepost = _PostsArray[sender.tag];
-    
-//    NSData *songFile = [[NSData alloc] initWithContentsOfURL:onepost.posturl options:NSDataReadingMappedIfSafe error:&error1 ];
     player = [[AVAudioPlayer alloc]initWithContentsOfURL:onepost.posturl error:&error];
     [player play];
-//    player = [[AVAudioPlayer alloc]initWithContentsOfURL:another error:&error];
     NSLog(@"%@",player.url);
     NSLog(@"%@",onepost);
 }
@@ -201,6 +187,13 @@
     [self.AudioTable reloadData];
 }
 
+- (IBAction)SoundOnlySwitch:(id)sender {
+    [self.defaults setBool:self.soundEffectOnly.on forKey:@"soundonly"];
+    [self.defaults synchronize];
+    
+    NSLog(@"%d",[self.defaults boolForKey:@"soundonly"]);
+}
+
 void finishPlaySoundCallBack(SystemSoundID sound_id, void *user_data){
     NSLog(@"finish playing");
 }
@@ -232,7 +225,6 @@ void finishPlaySoundCallBack(SystemSoundID sound_id, void *user_data){
     [textField resignFirstResponder];
     return YES;
 }
-
 
 
 @end

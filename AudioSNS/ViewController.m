@@ -20,12 +20,12 @@
 #import "Posts.h"
 #import "Mypost.h"
 #import "Replies.h"
-
+#define interval 10
 
 typedef enum{
+    none,
     isStart,
     isSpeakingNameofPost,
-    isSpeakingPost,
     isSpeakingGeneralInstruction,
     isSpeakingCommentInstruction,
     isSpeakingShareInstruction,
@@ -34,8 +34,12 @@ typedef enum{
     SoundEffectdefault,
     Commenting,
     Sharing,
-    WrongCommend,
-    Newposting
+    Newposting,
+    confirmComment,
+    confirmShare,
+    confirmPost,
+    Choosemode,
+    WrongCommend = 1 <<20,
 }Status;
 
 @interface ViewController ()
@@ -63,6 +67,10 @@ typedef enum{
 @synthesize pathToDynamicallyGeneratedDictionary;
 @synthesize pathToDynamicallyGeneratedLanguageModel;
 
+static double level[interval];
+static double totallevel;
+static int iteration;
+static BOOL flag;
 
 
 - (void)viewDidLoad
@@ -75,12 +83,36 @@ typedef enum{
     
     [self.openEarsEventsObserver setDelegate:self];
     
-    [self initialdata];
+    [self initialFunctions];
     
     self.defaults = [NSUserDefaults standardUserDefaults];
     
+    [self.fliteController say:[NSString stringWithFormat:@"Welcome to Voice based SNS, press START button to start"] withVoice:self.slt];
+    self.StartButton.hidden = NO;
+    
+    _status = none;
+    
+}
+- (void) initialFunctions{
+    //--------------------------Register Sound Effect in the system--------------------------------------
+    
+    NSURL *soundurl = [NSURL fileURLWithPath:[[NSBundle mainBundle]pathForResource:@"sf1" ofType:@"mp3"]];
+    AudioServicesCreateSystemSoundID((__bridge CFURLRef)soundurl, &_sf1);
+    soundurl = [NSURL fileURLWithPath:[[NSBundle mainBundle]pathForResource:@"sf2" ofType:@"mp3"]];
+    AudioServicesCreateSystemSoundID((__bridge CFURLRef)soundurl, &_sf2);
+    soundurl = [NSURL fileURLWithPath:[[NSBundle mainBundle]pathForResource:@"sf3" ofType:@"mp3"]];
+    AudioServicesCreateSystemSoundID((__bridge CFURLRef)soundurl, &_sf3);
+    soundurl = [NSURL fileURLWithPath:[[NSBundle mainBundle]pathForResource:@"sf4" ofType:@"mp3"]];
+    AudioServicesCreateSystemSoundID((__bridge CFURLRef)soundurl, &_sf4);
+    soundurl = [NSURL fileURLWithPath:[[NSBundle mainBundle]pathForResource:@"sf5" ofType:@"mp3"]];
+    AudioServicesCreateSystemSoundID((__bridge CFURLRef)soundurl, &_sf5);
+    soundurl = [NSURL fileURLWithPath:[[NSBundle mainBundle]pathForResource:@"sf6" ofType:@"mp3"]];
+    AudioServicesCreateSystemSoundID((__bridge CFURLRef)soundurl, &_sf6);
+    
+    //--------------------------Generate Language Model----------------------------------------------------
+    
     LanguageModelGenerator *lmGenerator = [[LanguageModelGenerator alloc] init];
-    NSArray *words = [NSArray arrayWithObjects:@"COMMENT", @"SHARE", @"CONFIRM", @"CANCEL", @"NEW", @"MAKE",@"POST", nil];
+    NSArray *words = [NSArray arrayWithObjects:@"COMMENT", @"SHARE", @"CONFIRM", @"CANCEL", @"NEW", @"MAKE",@"POST",@"QUIT",@"WANT",@"TO",@"REPLY", nil];
     NSString *name = @"NameIWantForMyLanguageModelFiles";
     NSError *err = [lmGenerator generateLanguageModelFromArray:words withFilesNamed:name forAcousticModelAtPath:[AcousticModel pathToModel:@"AcousticModelEnglish"]]; // Change "AcousticModelEnglish" to "AcousticModelSpanish" to create a Spanish language model instead of an English one.
     
@@ -99,13 +131,6 @@ typedef enum{
     }
     self.pathToDynamicallyGeneratedLanguageModel = lmPath;
     self.pathToDynamicallyGeneratedDictionary = dicPath;
-    
-    
-    [self.fliteController say:[NSString stringWithFormat:@"Welcome to Voice based SNS, press START button to start"] withVoice:self.slt];
-    self.StartButton.hidden = NO;
-    
-    _status = isStart;
-    
 }
 
 - (void) initialdata{
@@ -124,29 +149,17 @@ typedef enum{
     [fetchRequest setEntity:repliesentity];
     _Replies = [NSMutableArray arrayWithArray:[[TDSingletonCoreDataManager getManagedObjectContext] executeFetchRequest:fetchRequest error:&dataerror]];
     
-//--------------------------Register Sound Effect in the system--------------------------------------
-    
-    NSURL *soundurl = [NSURL fileURLWithPath:[[NSBundle mainBundle]pathForResource:@"sf1" ofType:@"mp3"]];
-    AudioServicesCreateSystemSoundID((__bridge CFURLRef)soundurl, &_sf1);
-    soundurl = [NSURL fileURLWithPath:[[NSBundle mainBundle]pathForResource:@"sf2" ofType:@"mp3"]];
-    AudioServicesCreateSystemSoundID((__bridge CFURLRef)soundurl, &_sf2);
-    soundurl = [NSURL fileURLWithPath:[[NSBundle mainBundle]pathForResource:@"sf3" ofType:@"mp3"]];
-    AudioServicesCreateSystemSoundID((__bridge CFURLRef)soundurl, &_sf3);
-    soundurl = [NSURL fileURLWithPath:[[NSBundle mainBundle]pathForResource:@"sf4" ofType:@"mp3"]];
-    AudioServicesCreateSystemSoundID((__bridge CFURLRef)soundurl, &_sf4);
-    soundurl = [NSURL fileURLWithPath:[[NSBundle mainBundle]pathForResource:@"sf5" ofType:@"mp3"]];
-    AudioServicesCreateSystemSoundID((__bridge CFURLRef)soundurl, &_sf5);
-    soundurl = [NSURL fileURLWithPath:[[NSBundle mainBundle]pathForResource:@"sf6" ofType:@"mp3"]];
-    AudioServicesCreateSystemSoundID((__bridge CFURLRef)soundurl, &_sf6);
-    
-    
-//    AudioServicesAddSystemSoundCompletion(SF1, NULL, NULL, NULL, NULL);
-//    AudioServicesPlaySystemSound(_sf1);
+    NSEntityDescription *mypostentity = [NSEntityDescription entityForName:@"Mypost" inManagedObjectContext:[TDSingletonCoreDataManager getManagedObjectContext]];
+    [fetchRequest setEntity:mypostentity];
+    _myposts = [NSMutableArray arrayWithArray:[[TDSingletonCoreDataManager getManagedObjectContext] executeFetchRequest:fetchRequest error:&dataerror]];
+    NSLog(@"%@\n\n\n%@\n\n\n%@",_myposts,_PostsArray,_Replies);
+
+
 }
 
 - (void)viewDidAppear:(BOOL)animated{
     [self initialdata];
-    NSLog(@"%ld", [_PostsArray count]);
+//    NSLog(@"%ld", [_PostsArray count]);
 }
 
 - (void) prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender{
@@ -170,11 +183,15 @@ typedef enum{
     if ([self.fliteController speechInProgress]) {
         [self.fliteController interruptTalking];
     }
-    
-    [self ReadStatus];
+    [self startlistening];
+    [self chooseMode];
 
 }
 
+-(void) chooseMode{
+    _status = isStart;
+    [self.fliteController say:@"Do you want to listen" withVoice:slt];
+}
 
 - (IBAction)SystemStop:(id)sender {
     self.StopButton.hidden = YES;
@@ -199,9 +216,15 @@ typedef enum{
     if ([self.pocketphinxController isListening]) {
         [self.pocketphinxController stopListening];
     }
+    if (_SilenceTimer) {
+        [_SilenceTimer invalidate];
+    }
     _status = isStart;
-    _StatusLabel.text = @"SPEAKING";
+//    _StatusLabel.text = @"SPEAKING";
+    
 }
+
+
 
 - (FliteController *)fliteController{
     if (fliteController == nil) {
@@ -248,12 +271,12 @@ typedef enum{
         Posts *onepost = _PostsArray[_NumberofPostisPlaying];
         _status = isSpeakingNameofPost;
         [self.fliteController say:[NSString stringWithFormat:@"%@ posted a status",onepost.authorname] withVoice:slt];
+        _StatusLabel.text = onepost.authorname;
     }
 }
 
 - (void) startlistening{
     [self.pocketphinxController startListeningWithLanguageModelAtPath:self.pathToDynamicallyGeneratedLanguageModel dictionaryAtPath:self.pathToDynamicallyGeneratedDictionary acousticModelAtPath:[AcousticModel pathToModel:@"AcousticModelEnglish"] languageModelIsJSGF:FALSE];
-    
 }
 
 - (void) stoplistening{
@@ -264,38 +287,121 @@ typedef enum{
 -(void) pocketsphinxDidReceiveHypothesis:(NSString *)hypothesis recognitionScore:(NSString *)recognitionScore utteranceID:(NSString *)utteranceID{
     
     NSInteger score = [recognitionScore integerValue];
-    
-    if ( score <= -5000) {
-        _status = WrongCommend;
+    NSLog(@"%u",_status);
+    if ( score <= -20000) {
+        _status = _status^WrongCommend;
         [self.fliteController say:@"Wrong command, please try again" withVoice:slt];
         NSLog(@"%@, %@",hypothesis,recognitionScore);
-    }else if (_status == isSpeakingGeneralInstruction){
-        NSLog(@"Command %@",hypothesis);
-        if ([hypothesis isEqualToString:@"COMMENT"]) {
-            _status = Commenting;
-            [self.pocketphinxController stopListening];
-            [self CommentPosts];
-            NSLog(@"comment");
-        }else if ([hypothesis isEqualToString:@"SHARE"]){
-            _status = Sharing;
-            [self.pocketphinxController stopListening];
-            [self.fliteController say:@"Do you want to share? say confirm or cancel" withVoice:slt];
-            _StatusLabel.text = @"SHARING";
-        }else if ([hypothesis isEqualToString:@"NEW POST"]){
-            _status = Newposting;
-            _StatusLabel.text = @"NEWPOST";
+        
+    }else if (_status == isStart){
+        if ([hypothesis rangeOfString:@"POST"].location != NSNotFound) {
+            [self.pocketphinxController suspendRecognition];
+            [self ReadStatus];
+            
+        }else if([hypothesis rangeOfString:@"REPLY"].location != NSNotFound){
             
         }
-    }else if (_status == Commenting){
+//--------------------Dealing with operation----------------------------------
+    }else if (_status == isSpeakingGeneralInstruction){
+        NSLog(@"Command %@",hypothesis);
+        if ([hypothesis rangeOfString:@"COMMENT"].location != NSNotFound) {
+            _status = Commenting;
+            [self.pocketphinxController suspendRecognition];
+            [self.fliteController say:@"Please comment" withVoice:slt];
+            NSLog(@"comment");
+        }else if ([hypothesis rangeOfString:@"SHARE"].location != NSNotFound){
+            _status = Sharing;
+            
+            [self.fliteController say:@"Do you want to share? say confirm or cancel" withVoice:slt];
+            _StatusLabel.text = @"SHARING";
+        }else if ([hypothesis rangeOfString:@"POST"].location != NSNotFound){
+            _status = Newposting;
+            _StatusLabel.text = @"NEWPOST";
+            [self.pocketphinxController suspendRecognition];
+            [self newPost];
+        }else if([hypothesis rangeOfString:@"QUIT"].location != NSNotFound){
+            [self.pocketphinxController suspendRecognition];
+            [self chooseMode];
+            return;
+        }else{
+            _status = _status^WrongCommend;
+            [self.fliteController say:@"Wrong command, please try again" withVoice:slt];
+            NSLog(@"%@, %@",hypothesis,recognitionScore);
+        }
         
+//--------------------Confirm Comment------------------------------------------
+        
+    }else if (_status == confirmComment){
+        if ([hypothesis rangeOfString:@"CONFIRM"].location != NSNotFound) {
+            [self.fliteController say:@"Comment Success" withVoice:slt];
+            _StatusLabel.text = @"Confirmed";
+            [TDSingletonCoreDataManager saveContext];
+        }else if([hypothesis rangeOfString:@"REDO"].location != NSNotFound){
+            _status = Commenting;
+            [self stoplistening];
+            [self.fliteController say:@"Please comment" withVoice:slt];
+            _StatusLabel.text = @"COMMENT";
+            return;
+        }else if([hypothesis rangeOfString:@"CANCEL"].location != NSNotFound){
+            [self.fliteController say:@"canceled" withVoice:slt];
+        }else{
+            _status = _status^WrongCommend;
+            [self.fliteController say:@"Wrong command, please try again" withVoice:slt];
+            NSLog(@"%@, %@",hypothesis,recognitionScore);
+            return;
+        }
+        if ((_NumberofPostisPlaying+1) < [_PostsArray count])
+            _NumberofPostisPlaying ++;
+        [self StopSystem];
+        [self ReadStatus];
+        
+//------------------Confirm Share---------------------------------------------
+        
+    }else if (_status == confirmShare){
+        if ([hypothesis rangeOfString:@"CONFIRM"].location != NSNotFound) {
+            [self.fliteController say:@"Share Success" withVoice:slt];
+        }else if([hypothesis rangeOfString:@"CANCEL"].location != NSNotFound){
+            [self.fliteController say:@"canceled" withVoice:slt];
+        }else{
+            _status = _status^WrongCommend;
+            [self.fliteController say:@"Wrong command, please try again" withVoice:slt];
+            NSLog(@"%@, %@",hypothesis,recognitionScore);
+        }
+        
+//--------------------Confirm Post---------------------------------------------
+        
+    }else if(_status == confirmPost){
+        NSLog(@"%@, %@",hypothesis,recognitionScore);
+        if ([hypothesis rangeOfString:@"CONFIRM"].location != NSNotFound) {
+            [self.fliteController say:@"Comment Success" withVoice:slt];
+            _StatusLabel.text = @"Confirmed";
+            [TDSingletonCoreDataManager saveContext];
+        }else if([hypothesis rangeOfString:@"REDO"].location != NSNotFound){
+            _status = Newposting;
+            [self stoplistening];
+            [self.fliteController say:@"Please comment" withVoice:slt];
+            _StatusLabel.text = @"NEWPOST";
+            return;
+        }else if([hypothesis rangeOfString:@"CANCEL"].location != NSNotFound){
+            [self.fliteController say:@"canceled" withVoice:slt];
+        }else{
+            _status = _status^WrongCommend;
+            [self.fliteController say:@"Wrong command, please try again" withVoice:slt];
+            NSLog(@"%@, %@",hypothesis,recognitionScore);
+            return;
+        }
+        if ((_NumberofPostisPlaying+1) < [_PostsArray count])
+            _NumberofPostisPlaying ++;
+        [self StopSystem];
+        [self ReadStatus];
     }
 }
 
 - (void)audioPlayerDidFinishPlaying:(AVAudioPlayer *)player successfully:(BOOL)flag {
     
     _status = isSpeakingGeneralInstruction;
-    [self startlistening];
-    [self.fliteController say:@"Say Comment a a a a "/*to make a comment on this post. share to share this post. continue to continue to next post or post to make a new post on your own timeline" */withVoice:slt];
+//    [self startlistening];
+    [self.fliteController say:@"Say instructions please "/*to make a comment on this post. share to share this post. continue to continue to next post or post to make a new post on your own timeline" */withVoice:slt];
     
     
 }
@@ -308,17 +414,25 @@ typedef enum{
         [self saypost];
     }else if(_status == isSpeakingGeneralInstruction){
         [self finishGeneralInstruction];
-    }else if(_status == WrongCommend){
+    }else if(_status & WrongCommend){
+        _status = _status^WrongCommend;
         [self finishGeneralInstruction];
     }else if(_status == Commenting){
-        
+        [self CommentPosts];
+    }else if(_status == confirmComment){
+        [self.pocketphinxController resumeRecognition];
+    }else if (_status == confirmPost){
+        [self.pocketphinxController resumeRecognition];
+    }else if (_status == isStart){
+        [self finishGeneralInstruction];
+    }else if (_status == Sharing){
+        [self finishGeneralInstruction];
     }
-    //    if ((_NumberofPostisPlaying+1) < [_PostsArray count]) {
-    //        _NumberofPostisPlaying ++;
-    //    }
+    
+        
 }
 
--(void) saypost{
+- (void) saypost{
     NSError *error;
     Posts *onepost = _PostsArray[_NumberofPostisPlaying];
     self.audioplayer = [[AVAudioPlayer alloc]initWithContentsOfURL:onepost.posturl error:&error];
@@ -326,14 +440,12 @@ typedef enum{
     [self.audioplayer play];
 }
 
--(void) finishGeneralInstruction{
+- (void) finishGeneralInstruction{
     AudioServicesPlaySystemSound(_sf2);
     [self.pocketphinxController resumeRecognition];
 }
 
-
-
-- (void)CommentPosts{
+- (void) CommentPosts{
     
     if (![self.defaults integerForKey:@"Mycount"]) {
         [self.defaults setInteger:0 forKey:@"Mycount"];
@@ -347,15 +459,13 @@ typedef enum{
     NSURL *recordurl = [NSURL fileURLWithPath:[NSString stringWithFormat:@"%@/MyRecord%ld.caf",documentsDirectory, Mycount]];
     NSDictionary *recordSetting = [NSDictionary dictionaryWithObjectsAndKeys:[NSNumber numberWithInt:AVAudioQualityMedium],AVEncoderAudioQualityKey,[NSNumber numberWithInt:16],AVEncoderBitRateKey,[NSNumber numberWithInt:2],AVNumberOfChannelsKey,[NSNumber numberWithFloat:44100.0],AVSampleRateKey, nil];
     self.audiorecorder = [[AVAudioRecorder alloc]initWithURL:recordurl settings:recordSetting error:&error];
-    AVAudioSession *audioSession = [AVAudioSession sharedInstance];
-    [audioSession setCategory:AVAudioSessionCategoryPlayAndRecord withOptions:AVAudioSessionCategoryOptionDefaultToSpeaker error:nil];
-    [audioSession setActive:YES error:nil];
+    [self.audiorecorder setMeteringEnabled:YES];
     
     
     
     if ([self.audiorecorder prepareToRecord] == 1){
-        [self.fliteController say:@"Please comment" withVoice:slt];
-        [self.audiorecorder record];
+        _StatusLabel.text = @"COMMENT";
+        
         AudioServicesPlaySystemSound(_sf3);
         [self.defaults setInteger:(Mycount+1) forKey:@"Mycount"];
         [self.defaults synchronize];
@@ -365,10 +475,15 @@ typedef enum{
         reply.replyofpost = _PostsArray[_NumberofPostisPlaying];
         [_Replies addObject:(reply)];
         
-        [TDSingletonCoreDataManager saveContext];
+        AVAudioSession *audioSession = [AVAudioSession sharedInstance];
+        [audioSession setCategory:AVAudioSessionCategoryPlayAndRecord error:nil];
+        [audioSession setActive:YES error:nil];
         
-        
-//        _SilenceTimer = [NSTimer scheduledTimerWithTimeInterval:1/16 invocation:invocation repeats:YES];
+        [self.audiorecorder record];
+        _StatusLabel.text = @"Recording";
+        totallevel = 0;
+        flag = 0;
+        _SilenceTimer = [NSTimer scheduledTimerWithTimeInterval:0.2 target:self selector:@selector(updateLevels) userInfo:nil repeats:YES];
         
     }
     
@@ -376,9 +491,76 @@ typedef enum{
 //    self.audiorecorder;
 }
 
-- (void)updateLevels{
+-(void) newPost{
     
+    NSError *error;
+    NSInteger Mycount = [self.defaults integerForKey:@"Mycount"];
+    NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
+    NSString *documentsDirectory = [paths objectAtIndex:0];
+    NSURL *recordurl = [NSURL fileURLWithPath:[NSString stringWithFormat:@"%@/MyPost%ld.caf",documentsDirectory, Mycount]];
+    NSDictionary *recordSetting = [NSDictionary dictionaryWithObjectsAndKeys:[NSNumber numberWithInt:AVAudioQualityMedium],AVEncoderAudioQualityKey,[NSNumber numberWithInt:16],AVEncoderBitRateKey,[NSNumber numberWithInt:2],AVNumberOfChannelsKey,[NSNumber numberWithFloat:44100.0],AVSampleRateKey, nil];
+    self.audiorecorder = [[AVAudioRecorder alloc]initWithURL:recordurl settings:recordSetting error:&error];
+    [self.audiorecorder setMeteringEnabled:YES];
+    
+    
+    
+    if ([self.audiorecorder prepareToRecord] == 1){
+        
+        
+        AudioServicesPlaySystemSound(_sf3);
+        [self.defaults setInteger:(Mycount+1) forKey:@"Mycount"];
+        [self.defaults synchronize];
+        NSLog(@"%ld",Mycount);
+        Mypost *mypost = [Mypost GenerateMyPost];
+        mypost.url = recordurl;
+        [_myposts addObject:(mypost)];
+        
+        AVAudioSession *audioSession = [AVAudioSession sharedInstance];
+        [audioSession setCategory:AVAudioSessionCategoryPlayAndRecord error:nil];
+        [audioSession setActive:YES error:nil];
+        
+        [self.audiorecorder record];
+        _StatusLabel.text = @"Recording";
+        totallevel = 0;
+        flag = 0;
+        _SilenceTimer = [NSTimer scheduledTimerWithTimeInterval:0.2 target:self selector:@selector(updateLevels) userInfo:nil repeats:YES];
+        
+    }
 }
+
+- (void) updateLevels{
+    [self.audiorecorder updateMeters];
+    
+    if (flag == 0) {
+        level[iteration] = [self.audiorecorder averagePowerForChannel:0];
+        iteration = (iteration + 1) % interval;
+        totallevel += [self.audiorecorder averagePowerForChannel:0];
+        if (iteration == 0) {
+            flag = 1;
+        }
+    }else if (totallevel >= -(40*interval)){
+        level[iteration] = [self.audiorecorder averagePowerForChannel:0];
+        iteration = (iteration + 1) % interval;
+        totallevel = totallevel + [self.audiorecorder averagePowerForChannel:0] - level[iteration];
+    }else{
+        NSLog(@"silence");
+        [self.audiorecorder stop];
+        if (_status == Commenting) {
+            _status = confirmComment;
+            [_SilenceTimer invalidate];
+            _StatusLabel.text = @"Confirm comment?";
+            [self.fliteController say:@"Say confirm, cancel or redo" withVoice:slt];
+            
+        }else if(_status == Newposting){
+            _status = confirmPost;
+            NSLog(@"confirm post %u",_status);
+            [_SilenceTimer invalidate];
+            _StatusLabel.text = @"Confirm post?";
+            [self.fliteController say:@"Say confirm, cancel or redo" withVoice:slt];
+        }
+    }
+}
+
 
 #pragma mark - SpeechRecognition
 - (void) pocketsphinxDidStartCalibration {
@@ -387,7 +569,7 @@ typedef enum{
 
 - (void) pocketsphinxDidCompleteCalibration {
 	NSLog(@"Pocketsphinx calibration is complete.");
-//    [self.pocketphinxController suspendRecognition];
+    [self.pocketphinxController suspendRecognition];
 }
 
 - (void) pocketsphinxDidStartListening {

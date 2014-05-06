@@ -8,13 +8,14 @@
 
 #import <UIKit/UIKit.h>
 #import <AVFoundation/AVFoundation.h>
-//#import "TDSingletonCoreDataManager.h"
 
 @class Posts;
 
 @interface BackendController : UIViewController <UITableViewDelegate, UITableViewDataSource,UITextFieldDelegate>
 - (IBAction)Record:(id)sender;
 - (IBAction)Stop:(id)sender;
+- (IBAction)SoundOnlySwitch:(id)sender;
+
 
 @property (nonatomic, strong) NSManagedObjectContext *context;
 
@@ -23,6 +24,7 @@
 @property (weak, nonatomic) IBOutlet UITableView *AudioTable;
 @property (nonatomic) NSUserDefaults *defaults;
 @property (weak, nonatomic) IBOutlet UITextField *NameBox;
+@property (strong, nonatomic) IBOutlet UISwitch *soundEffectOnly;
 
 
 @end

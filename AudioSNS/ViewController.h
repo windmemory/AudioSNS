@@ -35,11 +35,14 @@
 @property (nonatomic) PocketsphinxController *pocketphinxController;
 @property (nonatomic, copy) NSString *pathToDynamicallyGeneratedLanguageModel;
 @property (nonatomic, copy) NSString *pathToDynamicallyGeneratedDictionary;
+
 @property (nonatomic) AVAudioRecorder *audiorecorder;
 @property (nonatomic) AVAudioPlayer *audioplayer;
+
 @property (nonatomic) NSArray *PostsArray;
 @property (nonatomic) NSMutableArray *Replies;
 @property (nonatomic) NSMutableArray *myposts;
+
 @property (weak, nonatomic) IBOutlet UILabel *Title;
 @property (weak, nonatomic) IBOutlet UIButton *StartButton;
 @property (weak, nonatomic) IBOutlet UIButton *StopButton;
