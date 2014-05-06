@@ -19,6 +19,7 @@
 @property (nonatomic) NSMutableArray *repliesArray;
 @property (nonatomic) long count;
 @property (nonatomic) NSURL *recordURL;
+@property (nonatomic) long selectedPostNumber;
 @end
 
 @implementation MypostController
@@ -68,7 +69,9 @@
     // Dispose of any resources that can be recreated.
 }
 
-
+- (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath{
+    _selectedPostNumber = indexPath.row;
+}
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath{
     UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:@"cell"];
@@ -84,22 +87,78 @@
 
 -(NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section{
     return [_myPostArray count];
-    
 }
-/*
-#pragma mark - Navigation
 
-// In a storyboard-based application, you will often want to do a little preparation before navigation
-- (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender
-{
-    // Get the new view controller using [segue destinationViewController].
-    // Pass the selected object to the new view controller.
-}
-*/
 
 - (IBAction)startRecord:(id)sender {
+    _count = [self.defaults integerForKey:@"replyCount"];
+    NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
+    NSString *documentsDirectory = [paths objectAtIndex:0];
+    _recordURL = [NSURL fileURLWithPath:[NSString stringWithFormat:@"%@/Reply%ld.caf",documentsDirectory, _count]];
+    
+    
+    NSError *error = nil;
+    
+    self.recorder = [[AVAudioRecorder alloc]initWithURL:_recordURL settings:_recordSetting error:&error];
+    
+    if (error != nil) {
+        NSLog(@"Init recorder error: %@",error);
+    }
+    else if([self.recorder prepareToRecord]){
+        NSLog(@"Prepared successful");
+    }
+    
+    if (!self.recorder.recording) {
+        AVAudioSession *audioSession = [AVAudioSession sharedInstance];
+        [audioSession setCategory:AVAudioSessionCategoryPlayAndRecord withOptions:AVAudioSessionCategoryOptionDefaultToSpeaker error:nil];
+        [audioSession setActive:YES error:nil];
+        [self.recorder prepareToRecord];
+        [self.recorder record];
+    }
 }
 
 - (IBAction)stopRecord:(id)sender {
+    NSLog(@"stop");
+    if (self.recorder.recording) {
+        [self.recorder stop];
+    }
+    [self.defaults setInteger:_count+1 forKey:@"replyCount"];
+    [self.defaults synchronize];
+    Replies *newreply = [Replies GenerateNewReply];
+    newreply.author = self.nameBox.text;
+    newreply.messageurl = _recordURL;
+    Mypost *myTargetPost = _myPostArray[_selectedPostNumber];
+    myTargetPost.relationship = newreply;
+    
+    [_repliesArray addObject:newreply];
+    
+    [TDSingletonCoreDataManager saveContext];
+    [self.mypostTable reloadData];
+}
+
+- (void) textFieldDidBeginEditing:(UITextField *)textField{
+    NSTimeInterval animationDuration = 1.0f;
+    CGRect frame = self.view.frame;
+    frame.origin.y -=216;
+    frame.size.height +=216;
+    self.view.frame = frame;
+    [UIView beginAnimations:@"ResizeView" context:nil];
+    [UIView setAnimationDuration:animationDuration];
+    self.view.frame = frame;
+    [UIView commitAnimations];
+}
+
+- (BOOL) textFieldShouldReturn:(UITextField *)textField{
+    NSTimeInterval animationDuration = 1.0f;
+    CGRect frame = self.view.frame;
+    frame.origin.y +=216;
+    frame.size.height -=216;
+    self.view.frame = frame;
+    [UIView beginAnimations:@"ResizeView" context:nil];
+    [UIView setAnimationDuration:animationDuration];
+    self.view.frame = frame;
+    [UIView commitAnimations];
+    [textField resignFirstResponder];
+    return YES;
 }
 @end

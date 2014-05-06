@@ -9,7 +9,7 @@
 #import <UIKit/UIKit.h>
 #import <AVFoundation/AVFoundation.h>
 
-@interface MypostController : UIViewController<UITableViewDataSource,UITabBarControllerDelegate>
+@interface MypostController : UIViewController<UITableViewDataSource,UITableViewDelegate,UITextFieldDelegate>
 
 @property (nonatomic) AVAudioRecorder *recorder;
 @property (nonatomic) AVAudioPlayer *player;
