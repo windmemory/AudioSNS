@@ -4,7 +4,7 @@
 //
 //  Created by Gao Yuan on 4/4/14.
 //  Copyright (c) 2014 Gao Yuan. All rights reserved.
-//
+//  This is the main user interface of this program.
 
 #import "ViewController.h"
 #import <OpenEars/LanguageModelGenerator.h>
@@ -22,6 +22,8 @@
 #import "Replies.h"
 #define interval 10
 
+
+// This is the variable that controls the running status. After each operation, this status is changed
 typedef enum{
     none,
     isStart,
@@ -37,6 +39,7 @@ typedef enum{
     messageSystem,
     finishMessage,
     finishloop,
+    //Wrong Commend status is an add-on status, in order to maintain the previous status, I use "^" to add and remove WrongCommend status to current status.
     WrongCommend = 1 <<20,
 }Status;
 
@@ -72,8 +75,7 @@ static int iteration;
 static BOOL flag;
 
 
-- (void)viewDidLoad
-{
+- (void)viewDidLoad{
     [super viewDidLoad];
     
     self.StopButton.hidden = YES;
@@ -90,8 +92,10 @@ static BOOL flag;
     self.StartButton.hidden = NO;
     
     _status = none;
-    
+    _soundOnly = [self.defaults boolForKey:@"soundonly"];
 }
+
+//Initialize variables that used in the controller
 - (void) initialFunctions{
     //--------------------------Register Sound Effect in the system--------------------------------------
     
@@ -111,7 +115,7 @@ static BOOL flag;
     //--------------------------Generate Language Model----------------------------------------------------
     
     LanguageModelGenerator *lmGenerator = [[LanguageModelGenerator alloc] init];
-    NSArray *words = [NSArray arrayWithObjects:@"COMMENT", @"SHARE", @"CONFIRM", @"CANCEL", @"NEW", @"MAKE",@"POST",@"QUIT",@"WANT",@"REPLY",@"REDO",@"NEXT",@"LISTEN", nil];
+    NSArray *words = [NSArray arrayWithObjects:@"COMMENT", @"SHARE", @"CONFIRM", @"CANCEL", @"NEW", @"MAKE",@"POST",@"QUIT",@"WANT",@"REPLY",@"REDO",@"NEXT",@"CREATE", nil];
     NSString *name = @"NameIWantForMyLanguageModelFiles";
     NSError *err = [lmGenerator generateLanguageModelFromArray:words withFilesNamed:name forAcousticModelAtPath:[AcousticModel pathToModel:@"AcousticModelEnglish"]]; // Change "AcousticModelEnglish" to "AcousticModelSpanish" to create a Spanish language model instead of an English one.
     
@@ -130,6 +134,8 @@ static BOOL flag;
     }
     self.pathToDynamicallyGeneratedLanguageModel = lmPath;
     self.pathToDynamicallyGeneratedDictionary = dicPath;
+    
+    
 }
 
 - (void) initialdata{
@@ -151,20 +157,21 @@ static BOOL flag;
     NSEntityDescription *mypostentity = [NSEntityDescription entityForName:@"Mypost" inManagedObjectContext:[TDSingletonCoreDataManager getManagedObjectContext]];
     [fetchRequest setEntity:mypostentity];
     _myposts = [NSMutableArray arrayWithArray:[[TDSingletonCoreDataManager getManagedObjectContext] executeFetchRequest:fetchRequest error:&dataerror]];
-    NSLog(@"%@\n\n\n%@\n\n\n%@",_myposts,_PostsArray,_Replies);
+//    NSLog(@"%@\n\n\n%@\n\n\n%@",_myposts,_PostsArray,_Replies);
 
 
 }
 
 - (void)viewDidAppear:(BOOL)animated{
+//    if (_soundOnly != [self.defaults boolForKey:@"soundonly"]) {
+//        [self.defaults setBool:_soundOnly forKey:@"soundonly"];
+//    }
     [self initialdata];
 }
 
 - (void) prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender{
     [self StopSystem];
 }
-
-
 
 - (IBAction)SystemStart:(id)sender{
     
@@ -188,10 +195,14 @@ static BOOL flag;
 
 -(void) chooseMode{
     _status = isStart;
-    _StatusLabel.text = @"\"LISTEN\"\n\"REPLY\"\n\"NEW POST\"";
-    [self.fliteController say:@"What do you want to listen" withVoice:slt];
+    _StatusLabel.text = @"\"POST\"\n\"REPLY\"\n\"CREATE\"";
+    NSLog(@"%d",_soundOnly);
+    if (_soundOnly) {
+        [self.fliteController say:@"What can I do for you?" withVoice:slt];
+    }else{
+        [self.fliteController say:@"What can I do for you? Say post to listen to friend's post,   say reply to listen to messages,   say create to create a new post" withVoice:slt];
+    }
 }
-
 - (IBAction)SystemStop:(id)sender {
     self.StopButton.hidden = YES;
     self.Title.hidden = NO;
@@ -272,7 +283,7 @@ static BOOL flag;
     }else{
         Posts *onepost = _PostsArray[_NumberofPostisPlaying];
         _status = isSpeakingNameofPost;
-        [self.fliteController say:[NSString stringWithFormat:@"%@ posted a status",onepost.authorname] withVoice:slt];
+        [self.fliteController say:[NSString stringWithFormat:@"A new post from %@",onepost.authorname] withVoice:slt];
         _StatusLabel.text = onepost.authorname;
     }
 }
@@ -296,7 +307,7 @@ static BOOL flag;
         NSLog(@"%@, %@",hypothesis,recognitionScore);
         
     }else if (_status == isStart){
-        if ([hypothesis rangeOfString:@"LISTEN"].location != NSNotFound) {
+        if ([hypothesis rangeOfString:@"POST"].location != NSNotFound) {
             [self.pocketphinxController suspendRecognition];
             [self ReadStatus];
             
@@ -312,7 +323,7 @@ static BOOL flag;
             _StatusLabel.hidden = YES;
             _shimmeringView.hidden = YES;
             [self StopSystem];
-        }else if ([hypothesis rangeOfString:@"NEW POST"].location != NSNotFound){
+        }else if ([hypothesis rangeOfString:@"CREATE"].location != NSNotFound){
             _status = Newposting;
             _StatusLabel.text = @"NEWPOST";
             [self.fliteController say:@"Please start" withVoice:slt];

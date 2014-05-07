@@ -42,6 +42,7 @@
 @property (nonatomic) NSArray *PostsArray;
 @property (nonatomic) NSMutableArray *Replies;
 @property (nonatomic) NSMutableArray *myposts;
+@property (nonatomic) BOOL soundOnly;
 
 @property (weak, nonatomic) IBOutlet UILabel *Title;
 @property (weak, nonatomic) IBOutlet UIButton *StartButton;

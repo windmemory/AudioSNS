@@ -4,7 +4,7 @@
 //
 //  Created by Gao Yuan on 4/21/14.
 //  Copyright (c) 2014 Gao Yuan. All rights reserved.
-//
+//  This is a backend interface that allows you to add "friends' posts"
 
 #import "BackendController.h"
 #import "TDSingletonCoreDataManager.h"
@@ -46,6 +46,8 @@
     
 }
 
+
+//initialize variables used in the controller
 - (void)prepareData{
     
     _context = [TDSingletonCoreDataManager getManagedObjectContext];
@@ -71,6 +73,9 @@
 }
 
 - (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender{
+//    ViewController *desinationcontroller = [segue destinationViewController];
+//    desinationcontroller.soundOnly = [self.defaults boolForKey:@"soundonly"];
+    
     [player stop];
 }
 
@@ -93,17 +98,9 @@
         [self.AudioTable deleteRowsAtIndexPaths:[NSArray arrayWithObjects:indexPath, nil] withRowAnimation:UITableViewRowAnimationFade];
     }
     
-    NSLog(@"%@",_PostsArray);
+    
     [TDSingletonCoreDataManager saveContext];
 }
-
-
-#pragma mark - Navigation
-
-// In a storyboard-based application, you will often want to do a little preparation before navigation
-
-
-
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section{
     return [_PostsArray count];
