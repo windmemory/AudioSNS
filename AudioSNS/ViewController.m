@@ -111,7 +111,7 @@ static BOOL flag;
     //--------------------------Generate Language Model----------------------------------------------------
     
     LanguageModelGenerator *lmGenerator = [[LanguageModelGenerator alloc] init];
-    NSArray *words = [NSArray arrayWithObjects:@"COMMENT", @"SHARE", @"CONFIRM", @"CANCEL", @"NEW", @"MAKE",@"POST",@"QUIT",@"WANT",@"TO",@"REPLY", nil];
+    NSArray *words = [NSArray arrayWithObjects:@"COMMENT", @"SHARE", @"CONFIRM", @"CANCEL", @"NEW", @"MAKE",@"POST",@"QUIT",@"WANT",@"REPLY",@"REDO", nil];
     NSString *name = @"NameIWantForMyLanguageModelFiles";
     NSError *err = [lmGenerator generateLanguageModelFromArray:words withFilesNamed:name forAcousticModelAtPath:[AcousticModel pathToModel:@"AcousticModelEnglish"]]; // Change "AcousticModelEnglish" to "AcousticModelSpanish" to create a Spanish language model instead of an English one.
     
@@ -323,7 +323,7 @@ static BOOL flag;
         }else if ([hypothesis rangeOfString:@"SHARE"].location != NSNotFound){
             _status = Sharing;
             [self.fliteController say:@"Do you want to share? say confirm or cancel" withVoice:slt];
-            _StatusLabel.text = @"SHARING";
+            _StatusLabel.text = @"\"Confirm\"\n\"Cancel\"";
         }else if ([hypothesis rangeOfString:@"POST"].location != NSNotFound){
             _status = Newposting;
             _StatusLabel.text = @"NEWPOST";
@@ -348,7 +348,7 @@ static BOOL flag;
             [TDSingletonCoreDataManager saveContext];
         }else if([hypothesis rangeOfString:@"REDO"].location != NSNotFound){
             _status = Commenting;
-            [self stoplistening];
+            [self.pocketphinxController suspendRecognition];
             [self.fliteController say:@"Please comment" withVoice:slt];
             _StatusLabel.text = @"COMMENT";
             return;
@@ -362,7 +362,7 @@ static BOOL flag;
         }
         if ((_NumberofPostisPlaying+1) < [_PostsArray count])
             _NumberofPostisPlaying ++;
-        [self StopSystem];
+        [self.pocketphinxController suspendRecognition];
         [self ReadStatus];
         
 //------------------Confirm Share---------------------------------------------
@@ -378,8 +378,12 @@ static BOOL flag;
             _status = _status^WrongCommend;
             [self.fliteController say:@"Wrong command, please try again" withVoice:slt];
             NSLog(@"%@, %@",hypothesis,recognitionScore);
+            return;
         }
-        
+        if ((_NumberofPostisPlaying+1) < [_PostsArray count])
+            _NumberofPostisPlaying ++;
+        [self.pocketphinxController suspendRecognition];
+        [self ReadStatus];
 //--------------------Confirm Post---------------------------------------------
         
     }else if(_status == confirmPost){
@@ -390,7 +394,7 @@ static BOOL flag;
             [TDSingletonCoreDataManager saveContext];
         }else if([hypothesis rangeOfString:@"REDO"].location != NSNotFound){
             _status = Newposting;
-            [self stoplistening];
+            [self.pocketphinxController suspendRecognition];
             [self.fliteController say:@"Please comment" withVoice:slt];
             _StatusLabel.text = @"NEWPOST";
             return;
@@ -404,7 +408,7 @@ static BOOL flag;
         }
         if ((_NumberofPostisPlaying+1) < [_PostsArray count])
             _NumberofPostisPlaying ++;
-        [self StopSystem];
+        [self.pocketphinxController suspendRecognition];
         [self ReadStatus];
     }
 }
@@ -488,7 +492,7 @@ static BOOL flag;
     NSInteger Mycount = [self.defaults integerForKey:@"Mycount"];
     NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
     NSString *documentsDirectory = [paths objectAtIndex:0];
-    NSURL *recordurl = [NSURL fileURLWithPath:[NSString stringWithFormat:@"%@/MyRecord%ld.caf",documentsDirectory, Mycount]];
+    NSURL *recordurl = [NSURL fileURLWithPath:[NSString stringWithFormat:@"%@/MyComment%ld.caf",documentsDirectory, Mycount]];
     NSDictionary *recordSetting = [NSDictionary dictionaryWithObjectsAndKeys:[NSNumber numberWithInt:AVAudioQualityMedium],AVEncoderAudioQualityKey,[NSNumber numberWithInt:16],AVEncoderBitRateKey,[NSNumber numberWithInt:2],AVNumberOfChannelsKey,[NSNumber numberWithFloat:44100.0],AVSampleRateKey, nil];
     self.audiorecorder = [[AVAudioRecorder alloc]initWithURL:recordurl settings:recordSetting error:&error];
     [self.audiorecorder setMeteringEnabled:YES];
@@ -496,7 +500,6 @@ static BOOL flag;
     
     
     if ([self.audiorecorder prepareToRecord] == 1){
-        _StatusLabel.text = @"COMMENT";
         
         AudioServicesPlaySystemSound(_sf3);
         [self.defaults setInteger:(Mycount+1) forKey:@"Mycount"];
@@ -657,6 +660,7 @@ static BOOL flag;
     
     _StatusLabel = [[UILabel alloc] initWithFrame:_shimmeringView.bounds];
     _StatusLabel.textAlignment = NSTextAlignmentCenter;
+    _StatusLabel.numberOfLines = 0;
     _StatusLabel.text = @"SPEAKING";
     _StatusLabel.textColor = [UIColor colorWithRed:16.0f/255.0f green:162.0f/255.0f blue:227.0f/255.0f alpha:1.0f];
     _StatusLabel.font = [UIFont fontWithName:@"Helvetica Light" size:36];
