@@ -39,6 +39,7 @@ typedef enum{
     messageSystem,
     finishMessage,
     finishloop,
+    quit,
     //Wrong Commend status is an add-on status, in order to maintain the previous status, I use "^" to add and remove WrongCommend status to current status.
     WrongCommend = 1 <<20,
 }Status;
@@ -52,6 +53,7 @@ typedef enum{
 @property (nonatomic) UILabel *StatusLabel;
 @property (nonatomic) FBShimmeringView *shimmeringView;
 @property (nonatomic) NSUserDefaults *defaults;
+@property (nonatomic) BOOL isSpeakWelcome;
 @property (nonatomic) SystemSoundID sf1;
 @property (nonatomic) SystemSoundID sf2;
 @property (nonatomic) SystemSoundID sf3;
@@ -74,7 +76,6 @@ static double totallevel;
 static int iteration;
 static BOOL flag;
 
-
 - (void)viewDidLoad{
     [super viewDidLoad];
     
@@ -90,9 +91,9 @@ static BOOL flag;
     
     [self.fliteController say:[NSString stringWithFormat:@"Welcome to Voice based SNS, press START button to start"] withVoice:self.slt];
     self.StartButton.hidden = NO;
-    
+    _isSpeakWelcome = YES;
     _status = none;
-    _soundOnly = [self.defaults boolForKey:@"soundonly"];
+    
 }
 
 //Initialize variables that used in the controller
@@ -163,9 +164,10 @@ static BOOL flag;
 }
 
 - (void)viewDidAppear:(BOOL)animated{
-//    if (_soundOnly != [self.defaults boolForKey:@"soundonly"]) {
-//        [self.defaults setBool:_soundOnly forKey:@"soundonly"];
-//    }
+
+    [self.defaults synchronize];
+    _soundOnly = [self.defaults boolForKey:@"soundonly"];
+    NSLog(@"soundOnly: %d",_soundOnly);
     [self initialdata];
 }
 
@@ -193,16 +195,23 @@ static BOOL flag;
 
 }
 
--(void) chooseMode{
+- (void) chooseMode{
     _status = isStart;
-    _StatusLabel.text = @"\"POST\"\n\"REPLY\"\n\"CREATE\"";
-    NSLog(@"%d",_soundOnly);
+    _StatusLabel.text = @"\"POST\"\n\"REPLY\"\n\"CREATE\"\n\"QUIT\"";
+    NSString *intro;
+    if (_isSpeakWelcome) {
+        intro = [NSString stringWithFormat:@"Hello boss, you have %lu posts from your friends and %lu replies",[_PostsArray count],[_Replies count]];
+        _isSpeakWelcome = NO;
+    }else
+        intro = @" ";
+    
     if (_soundOnly) {
-        [self.fliteController say:@"What can I do for you?" withVoice:slt];
+        [self.fliteController say: [NSString stringWithFormat: @"%@ What can I do for you?",intro] withVoice:slt];
     }else{
-        [self.fliteController say:@"What can I do for you? Say post to listen to friend's post,   say reply to listen to messages,   say create to create a new post" withVoice:slt];
+        [self.fliteController say: [NSString stringWithFormat:@"%@ What can I do for you? Say post to listen to friend's post,   say reply to listen to messages,   say create to create a new post,   say quit to quit",intro]withVoice:slt];
     }
 }
+
 - (IBAction)SystemStop:(id)sender {
     self.StopButton.hidden = YES;
     self.Title.hidden = NO;
@@ -229,6 +238,7 @@ static BOOL flag;
     if (_SilenceTimer) {
         [_SilenceTimer invalidate];
     }
+    _isSpeakWelcome = YES;
     _status = isStart;
     
 }
@@ -322,7 +332,8 @@ static BOOL flag;
             self.StartButton.hidden = NO;
             _StatusLabel.hidden = YES;
             _shimmeringView.hidden = YES;
-            [self StopSystem];
+            _status = quit;
+            [self.fliteController say:@"Bye-bye, see you next time" withVoice:slt];
         }else if ([hypothesis rangeOfString:@"CREATE"].location != NSNotFound){
             _status = Newposting;
             _StatusLabel.text = @"NEWPOST";
@@ -340,7 +351,7 @@ static BOOL flag;
             _status = Sharing;
             [self.fliteController say:@"Do you want to share? say confirm or cancel" withVoice:slt];
             _StatusLabel.text = @"\"CONFIRM\"\n\"CANCEL\"";
-        }else if ([hypothesis rangeOfString:@"NEW POST"].location != NSNotFound){
+        }else if ([hypothesis rangeOfString:@"CREATE"].location != NSNotFound){
             _status = Newposting;
             _StatusLabel.text = @"NEWPOST";
             [self.fliteController say:@"Please start" withVoice:slt];
@@ -364,6 +375,7 @@ static BOOL flag;
         
     }else if (_status == confirmComment){
         if ([hypothesis rangeOfString:@"CONFIRM"].location != NSNotFound) {
+            AudioServicesPlaySystemSound(_sf3);
             [self.fliteController say:@"Comment Success" withVoice:slt];
             _StatusLabel.text = @"SUCCESS";
             [self.pocketphinxController suspendRecognition];
@@ -379,6 +391,7 @@ static BOOL flag;
             _status = finishloop;
             _StatusLabel.text = @"CANCELED";
             [self.pocketphinxController suspendRecognition];
+            AudioServicesPlaySystemSound(_sf5);
             [self.fliteController say:@"canceled" withVoice:slt];
         }else{
             _status = _status^WrongCommend;
@@ -389,7 +402,7 @@ static BOOL flag;
         if ((_NumberofPostisPlaying+1) < [_PostsArray count])
             _NumberofPostisPlaying ++;
         [self.pocketphinxController suspendRecognition];
-        [self ReadStatus];
+        
         
 //------------------Confirm Share---------------------------------------------
         
@@ -397,9 +410,11 @@ static BOOL flag;
         if ([hypothesis rangeOfString:@"CONFIRM"].location != NSNotFound) {
             _status = finishloop;
             _StatusLabel.text = @"SUCCESS";
+            AudioServicesPlaySystemSound(_sf3);
             [self.fliteController say:@"Share Success" withVoice:slt];
         }else if([hypothesis rangeOfString:@"CANCEL"].location != NSNotFound){
             _status = finishloop;
+            AudioServicesPlaySystemSound(_sf5);
             [self.fliteController say:@"canceled" withVoice:slt];
         }else{
             _status = _status^WrongCommend;
@@ -416,6 +431,7 @@ static BOOL flag;
     }else if(_status == confirmPost){
         NSLog(@"%@, %@",hypothesis,recognitionScore);
         if ([hypothesis rangeOfString:@"CONFIRM"].location != NSNotFound) {
+            AudioServicesPlaySystemSound(_sf3);
             [self.fliteController say:@"Comment Success" withVoice:slt];
             _StatusLabel.text = @"POSTED";
             [self.pocketphinxController suspendRecognition];
@@ -431,7 +447,8 @@ static BOOL flag;
             _StatusLabel.text = @"CANCELED";
             _status = finishloop;
             [self.pocketphinxController suspendRecognition];
-            [self.fliteController say:@"cancel" withVoice:slt];
+            AudioServicesPlaySystemSound(_sf5);
+            [self.fliteController say:@"canceled" withVoice:slt];
         }else{
             _status = _status^WrongCommend;
             [self.fliteController say:@"Wrong command, please try again" withVoice:slt];
@@ -441,7 +458,7 @@ static BOOL flag;
         if ((_NumberofPostisPlaying+1) < [_PostsArray count])
             _NumberofPostisPlaying ++;
         [self.pocketphinxController suspendRecognition];
-        [self ReadStatus];
+        
     }
 }
 
@@ -449,8 +466,12 @@ static BOOL flag;
     
     if (_status != messageSystem){
         _status = isSpeakingGeneralInstruction;
-        _StatusLabel.text = @"\"NEXT\"\n\"SHARE\"\n\"COMMENT\"\n\"NEW POST\"\n\"QUIT\"";
-        [self.fliteController say:@"Say instructions please "/*to make a comment on this post. share to share this post. continue to continue to next post or post to make a new post on your own timeline" */withVoice:slt];
+        _StatusLabel.text = @"\"NEXT\"\n\"SHARE\"\n\"COMMENT\"\n\"CREATE\"\n\"QUIT\"";
+        if (_soundOnly) {
+            [self.fliteController say:@"Please say command" withVoice:slt];
+        }else{
+            [self.fliteController say:@"Please say command. Say next for next post, say share to repost, say comment to make a comment, say create to create a new post, say quit to return"withVoice:slt];
+        }
     }
 }
 
@@ -482,6 +503,8 @@ static BOOL flag;
         [self ReadStatus];
     }else if (_status == Newposting){
         [self newPost];
+    }else if (_status == quit){
+        [self StopSystem];
     }
 }
 
@@ -619,7 +642,7 @@ static BOOL flag;
             [self.fliteController say:@"Say confirm, cancel or redo" withVoice:slt];
         }
     }
-    NSLog(@"%f",[self.audiorecorder averagePowerForChannel:0]);
+    NSLog(@"%f",totallevel);
 }
 
 
@@ -681,7 +704,6 @@ static BOOL flag;
 
 - (void) initializashimmeringview{
     _shimmeringView = [[FBShimmeringView alloc] initWithFrame:CGRectMake(0, 100, 320, 250)];
-    NSLog(@"%@",self.view);
     [self.view addSubview:_shimmeringView];
     
     _StatusLabel = [[UILabel alloc] initWithFrame:_shimmeringView.bounds];
